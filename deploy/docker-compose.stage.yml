@@ -1,0 +1,16 @@
+version: '3.10'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    environment:
+      SLACK_FASTAPI_HOST: 0.0.0.0
+      SLACK_FASTAPI_PORT: 8000
+    ports:
+    - "8000:8000"

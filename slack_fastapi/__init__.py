@@ -1,0 +1,1 @@
+"""slack_fastapi package."""

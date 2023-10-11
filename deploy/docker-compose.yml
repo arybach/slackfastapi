@@ -1,0 +1,62 @@
+version: '3.10'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SLACK_FASTAPI_HOST: 0.0.0.0
+      SLACK_FASTAPI_PORT: 8000
+      SLACK_FASTAPI_DB_HOST: slack_fastapi-db
+      SLACK_FASTAPI_DB_PORT: 5432
+      SLACK_FASTAPI_DB_USER: slack_fastapi
+      SLACK_FASTAPI_DB_PASS: slack_fastapi
+      SLACK_FASTAPI_DB_BASE: slack_fastapi
+    ports:
+    - "8000:8000"
+
+  db:
+    image: postgres:13.8-bullseye
+    hostname: slack_fastapi-db
+    environment:
+      POSTGRES_PASSWORD: "slack_fastapi"
+      POSTGRES_USER: "slack_fastapi"
+      POSTGRES_DB: "slack_fastapi"
+    volumes:
+    - slack_fastapi-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U slack_fastapi
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    ports:
+    - "8432:5432"
+
+  migrator:
+    image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      SLACK_FASTAPI_DB_HOST: slack_fastapi-db
+      SLACK_FASTAPI_DB_PORT: 5432
+      SLACK_FASTAPI_DB_USER: slack_fastapi
+      SLACK_FASTAPI_DB_PASS: slack_fastapi
+      SLACK_FASTAPI_DB_BASE: slack_fastapi
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+volumes:
+  slack_fastapi-db-data:
+    name: slack_fastapi-db-data

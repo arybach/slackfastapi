@@ -1,0 +1,98 @@
+[tool.poetry]
+name = "slack_fastapi"
+version = "1.0.0"
+description = "RESTful API backend for SlackCutter App"
+authors = [
+    "RoyalGoose",
+    "Daniel"
+]
+maintainers = [
+    "RoyalGoose",
+    "Daniel"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.85.0"
+uvicorn = { version = "^0.18.3", extras = ["standard"] }
+pydantic = {version = "^1.10.2", extras = ["dotenv"]}
+yarl = "^1.8.1"
+ujson = "^5.5.0"
+ormar = "^0.11.3"
+alembic = "^1.8.1"
+asyncpg = "^0.26.0"
+psycopg2-binary = "^2.9.3"
+httptools = "^0.5.0"
+loguru = "^0.6.0"
+setuptools = "^65.5.0"
+
+# Deps for backend logic
+fastapi-mail = "^1.2.0"
+PyJWT = "^2.6.0"
+python-jose = "^3.3.0"
+passlib = "^1.7.4"
+python-multipart = "^0.0.5"
+bcrypt = "^4.0.1"
+
+# Deps for AWS
+aioboto3 = "^10.1.0"
+
+# Deps for slackcutter
+pandas = "^1.5.1"
+opencv-python = "^4.6.0.66"
+joblib = "^1.2.0"
+pydub = "^0.25.1"
+ffmpeg-python = "^0.2.0"
+scikit-learn = "^1.1.3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.3"
+flake8 = "~4.0.1"
+mypy = "^0.981"
+isort = "^5.10.1"
+yesqa = "^1.4.0"
+pre-commit = "^2.20.0"
+wemake-python-styleguide = "^0.17.0"
+black = "^22.8.0"
+autoflake = "^1.6.1"
+pytest-cov = "^4.0.0"
+anyio = "^3.6.1"
+pytest-env = "^0.6.2"
+httpx = "^0.23.0"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["slack_fastapi",]
+
+[tool.mypy]
+strict = true
+ignore_missing_imports = true
+allow_subclassing_any = true
+allow_untyped_calls = true
+pretty = true
+show_error_codes = true
+implicit_reexport = true
+allow_untyped_decorators = true
+warn_unused_ignores = false
+warn_return_any = false
+namespace_packages = true
+exclude = [
+    "migrations/",
+    "slackcutter/",
+]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore:.*unclosed.*:ResourceWarning",
+]
+env = [
+    "SLACK_FASTAPI_DB_BASE=slack_fastapi_test",
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
