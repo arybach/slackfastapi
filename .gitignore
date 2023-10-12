@@ -144,3 +144,5 @@ cython_debug/
 # Inner folders
 logs/
 temp/
+
+trained_models/
