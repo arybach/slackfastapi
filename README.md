@@ -243,3 +243,43 @@ Default settings is:
 8. Copy video `id` from response of 7.
 9. Create clip by `[POST] /api/clip`
 10. Download final clip by `[POST] /api/clip/download`
+
+### Deployment instructions
+```
+git clone http://github.com/arybach/slackfastapi
+cd slackfastapi/terraform
+terraform init
+terraform apply -var-file=terraform.tfvars -auto-approve
+terraform output -json > ../ansible/terraform_outputs.json
+cd ../ansible
+ansible-playbook fetch-creds.yml
+```
+### update DNS records in yandex CLI
+![Alt text](image.png)
+
+### create managed Gitlab instance via yandex UI
+![Alt text](image-1.png)
+![Alt text](image-2.png)
+
+### login using reset link sent to the email provided at Gitlab instance creation
+### then create group
+![Alt text](image-3.png)
+
+### Under Settings -> CI/CD -> expand variables and add docker hub credentials:
+```
+CI_REGISTRY_USER
+CI_REGISTRY_PASSWORD
+```
+### Create new project for the group
+![Alt text](image-4.png)
+
+### then push slackfastapi-master to gitlab
+```
+cd /media/groot/projects/slackfastapi/slackfastapi-master
+git init --initial-branch=main # if needed
+git remote set-url origin https://redevops.gitlab.yandexcloud.net/slackfastapi/slackfastapi.git
+# check
+git remote -v
+git push --set-upstream origin main
+
+```
