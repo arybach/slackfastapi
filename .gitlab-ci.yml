@@ -77,7 +77,7 @@ stage-clean:
     name: staging
     action: stop
   before_script:
-  - mv $STAGE_ENV .env
+  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
   script:
   - docker compose -f deploy/docker-compose.stage.yml --project-directory . down
 
@@ -89,13 +89,13 @@ clean:
   environment:
     name: production
   before_script:
-  - mv $ENV .env
+  - if [ -n "$ENV" ]; then mv $ENV .env; fi
   script:
   - docker compose -f deploy/docker-compose.yml --project-directory . down
 
 .pre-stage-build:
   before_script:
-  - mv $STAGE_ENV .env
+  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
   - >
     sed -i "s/8000:8000/$DEPLOY_APP_HOST:$DEPLOY_APP_PORT:8000/" deploy/docker-compose.stage.yml
 
@@ -115,7 +115,7 @@ stage-build:
 
 .pre-build:
   before_script:
-  - mv $ENV .env
+  - if [ -n "$ENV" ]; then mv $ENV .env; fi
   - >
     sed -i "s/8000:8000/$DEPLOY_APP_HOST:$DEPLOY_APP_PORT:8000/" deploy/docker-compose.yml
   - >
@@ -176,7 +176,7 @@ stage-stop:
     name: staging
     action: stop
   before_script:
-  - mv $STAGE_ENV .env
+  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
   script:
   - docker compose -f deploy/docker-compose.stage.yml --project-directory . down
 
@@ -190,6 +190,6 @@ stop:
     name: production
     action: stop
   before_script:
-  - mv $ENV .env
+  - if [ -n "$ENV" ]; then mv $ENV .env; fi
   script:
   - docker compose -f deploy/docker-compose.yml --project-directory . down

@@ -270,7 +270,7 @@ ansible-playbook fetch-creds.yml
 CI_REGISTRY_USER
 CI_REGISTRY_PASSWORD
 ```
-### Create new project for the group
+### Create new project for the group (ADD ssh key via Gitlab UI)
 ![Alt text](image-4.png)
 
 ### then push slackfastapi-master to gitlab
@@ -280,6 +280,25 @@ git init --initial-branch=main # if needed
 git remote set-url origin https://redevops.gitlab.yandexcloud.net/slackfastapi/slackfastapi.git
 # check
 git remote -v
-git push --set-upstream origin main
-
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/tumblebuns
+# change remote url to use ssh:
+git remote set-url origin git@redevops.gitlab.yandexcloud.net:slackfastapi/slackfastapi.git
+git push -u origin main
 ```
+### under project Settings -> CI/CD -> Runners -> New Runner
+![Alt text](image-5.png)
+
+### then follow instaructions to register runner:
+```
+# for a dedicated VM setup:
+gitlab-runner register  --url https://redevops.gitlab.yandexcloud.net  --token glrt-XeMFndRZNebqCpt8Xift
+
+# for kubernetes setup:
+cd ../ansible
+export GITLAB_RUNNER_TOKEN=GR1348941ux54obusFXvjWk9M9RsH
+ansible-playbook deploy-runner.yml
+```
+![Alt text](image-6.png)
+### under project -> Settings -> CI/CD -> Runners click on the newly registered runner to edit:
+### add tags: docker-runner, kubernetes-runner, deploy-runner
