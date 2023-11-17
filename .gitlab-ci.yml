@@ -70,13 +70,6 @@ stage-clean:
   when: manual
   stage: clean
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -90,13 +83,6 @@ stage-clean:
 clean:
   stage: clean
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   tags:
   - deploy-runner
   environment:
@@ -116,14 +102,6 @@ stage-build:
   when: manual
   stage: build
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -142,45 +120,54 @@ stage-build:
   - >
     sed -i "s/8432:5432/$DEPLOY_DB_HOST:$DEPLOY_DB_PORT:5432/" deploy/docker-compose.yml
 
+.build-template: &build_definition
+  image:
+    name: gcr.io/kaniko-project/executor:latest
+    entrypoint: [""]
+  script:
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+  - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+
 build:
   stage: build
-  image: docker:20.10.16
+  extends:
+  - .pre-build
   tags:
-  - deploy-runner
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
+  - kubernetes-runner
+  needs: ["clean"]
+  <<: *build_definition
   variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
     # Set these variables in GitLab CI/CD settings
     CI_REGISTRY_USER: $CI_REGISTRY_USER
     CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   environment:
     name: production
     url: $DEPLOY_URL
-  needs: ["clean"]
-  extends:
-  - .pre-build
-  script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-  - docker-compose -f deploy/docker-compose.yml --project-directory . build
-  - docker-compose -f deploy/docker-compose.yml --project-directory . push slack_fastapi
+
+# build:
+#   stage: build
+#   image: docker:20.10.16
+#   tags:
+#   - deploy-runner
+#   variables:
+#     # Set these variables in GitLab CI/CD settings
+#     CI_REGISTRY_USER: $CI_REGISTRY_USER
+#     CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+#   environment:
+#     name: production
+#     url: $DEPLOY_URL
+#   needs: ["clean"]
+#   extends:
+#   - .pre-build
+#   script:
+#   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+#   - docker-compose -f deploy/docker-compose.yml --project-directory . build
+#   - docker-compose -f deploy/docker-compose.yml --project-directory . push slack_fastapi
 
 staging:
   when: manual
   stage: staging
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   needs: ["stage-build"]
   tags:
   - stage-runner
@@ -196,14 +183,6 @@ staging:
 deploy:
   stage: deploy
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   needs: ["build"]
   tags:
   - deploy-runner
@@ -220,14 +199,6 @@ stage-stop:
   when: manual
   stage: stop
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -242,14 +213,6 @@ stop:
   when: manual
   stage: stop
   image: docker:20.10.16
-  services:
-  - name: docker:dind
-    alias: dockerhost
-
-  variables:
-    DOCKER_HOST: tcp://dockerhost:2375/
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
   tags:
   - deploy-runner
   environment:
