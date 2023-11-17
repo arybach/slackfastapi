@@ -75,6 +75,7 @@ stage-clean:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -93,6 +94,7 @@ clean:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   tags:
   - deploy-runner
   environment:
@@ -117,6 +119,7 @@ stage-build:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -145,6 +148,7 @@ build:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
     # Set these variables in GitLab CI/CD settings
     CI_REGISTRY_USER: $CI_REGISTRY_USER
     CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
@@ -168,6 +172,7 @@ staging:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   needs: ["stage-build"]
   tags:
   - stage-runner
@@ -188,6 +193,7 @@ deploy:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   needs: ["build"]
   tags:
   - deploy-runner
@@ -209,6 +215,7 @@ stage-stop:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   tags:
   - stage-runner
   environment:
@@ -228,6 +235,7 @@ stop:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
   tags:
   - deploy-runner
   environment:
