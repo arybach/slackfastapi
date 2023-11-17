@@ -144,14 +144,14 @@ You can read more about pre-commit here: https://pre-commit.com/
 
 [↑](#table-of-contents)
 ## Kubernetes
-To run your app in kubernetes
-just run:
+To run your app in kubernetes - build migrator image first,
+then run:
 ```bash
+kubectl create namespace skack-fastapi
 kubectl apply -f deploy/kube
 ```
 
 It will create needed components.
-
 If you haven't pushed to docker registry yet, you can build image locally.
 
 ```bash
@@ -257,6 +257,11 @@ ansible-playbook fetch-creds.yml
 ### update DNS records in yandex CLI
 ![Alt text](image.png)
 
+```
+cd ../slackfastapi-master
+kubectl create namespace slack-fastapi
+kubectl apply -f deploy/kube
+```
 ### create managed Gitlab instance via yandex UI
 ![Alt text](image-1.png)
 ![Alt text](image-2.png)
@@ -302,3 +307,21 @@ ansible-playbook deploy-runner.yml
 ![Alt text](image-6.png)
 ### under project -> Settings -> CI/CD -> Runners click on the newly registered runner to edit:
 ### add tags: docker-runner, kubernetes-runner, deploy-runner
+
+### under project -> Settings -> CI/CD -> Variables add:
+```
+# General FastAPI settings
+SLACK_FASTAPI_RELOAD="True"
+SLACK_FASTAPI_PORT="8000"
+SLACK_FASTAPI_ENVIRONMENT="dev"
+
+# Database settings (modify with your database credentials)
+SLACK_FASTAPI_DB_HOST="slack_fastapi-db"  # Use the service name of the database in docker-compose.yml
+SLACK_FASTAPI_DB_PORT="5432"              # Same as in docker-compose.yml
+SLACK_FASTAPI_DB_USER="slack_fastapi"     # Same as POSTGRES_USER in docker-compose.yml
+SLACK_FASTAPI_DB_PASSWORD="slack_fastapi" # Same as POSTGRES_PASSWORD in docker-compose.yml
+SLACK_FASTAPI_DB_NAME="slack_fastapi"     # Same as POSTGRES_DB in docker-compose.yml
+
+# Additional settings (if any) based on your application's `settings.py`, for example:
+# SLACK_FASTAPI_API_KEY="your_api_key_value"
+```
