@@ -71,7 +71,8 @@ stage-clean:
   stage: clean
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -90,7 +91,8 @@ clean:
   stage: clean
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -115,7 +117,9 @@ stage-build:
   stage: build
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -144,7 +148,9 @@ build:
   tags:
   - deploy-runner
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -168,7 +174,9 @@ staging:
   stage: staging
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -189,7 +197,9 @@ deploy:
   stage: deploy
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -211,7 +221,9 @@ stage-stop:
   stage: stop
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
@@ -231,7 +243,9 @@ stop:
   stage: stop
   image: docker:20.10.16
   services:
-  - docker:dind alias:dockerhost
+  - name: docker:dind
+    alias: dockerhost
+
   variables:
     DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
