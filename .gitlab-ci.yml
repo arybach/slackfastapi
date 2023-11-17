@@ -50,7 +50,6 @@ pytest:
   - name: postgres:13.8-bullseye
     alias: database
   variables:
-
     # Postgresql variables
     SLACK_FASTAPI_DB_HOST: database
     POSTGRES_PASSWORD: slack_fastapi
@@ -71,6 +70,11 @@ stage-clean:
   when: manual
   stage: clean
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   tags:
   - stage-runner
   environment:
@@ -84,6 +88,11 @@ stage-clean:
 clean:
   stage: clean
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   tags:
   - deploy-runner
   environment:
@@ -103,6 +112,11 @@ stage-build:
   when: manual
   stage: build
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   tags:
   - stage-runner
   environment:
@@ -126,6 +140,14 @@ build:
   image: docker:20.10.16
   tags:
   - deploy-runner
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    # Set these variables in GitLab CI/CD settings
+    CI_REGISTRY_USER: $CI_REGISTRY_USER
+    CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
   environment:
     name: production
     url: $DEPLOY_URL
@@ -133,12 +155,19 @@ build:
   extends:
   - .pre-build
   script:
-  - docker compose -f deploy/docker-compose.yml --project-directory . build
+  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+  - docker-compose -f deploy/docker-compose.yml --project-directory . build
+  - docker-compose -f deploy/docker-compose.yml --project-directory . push slack_fastapi
 
 staging:
   when: manual
   stage: staging
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   needs: ["stage-build"]
   tags:
   - stage-runner
@@ -154,6 +183,11 @@ staging:
 deploy:
   stage: deploy
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   needs: ["build"]
   tags:
   - deploy-runner
@@ -165,11 +199,16 @@ deploy:
   - .pre-build
   script:
   - docker compose -f deploy/docker-compose.yml --project-directory . up -d
-  
+
 stage-stop:
   when: manual
   stage: stop
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   tags:
   - stage-runner
   environment:
@@ -184,6 +223,11 @@ stop:
   when: manual
   stage: stop
   image: docker:20.10.16
+  services:
+  - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
   tags:
   - deploy-runner
   environment:
