@@ -71,9 +71,9 @@ stage-clean:
   stage: clean
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   tags:
@@ -90,9 +90,9 @@ clean:
   stage: clean
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   tags:
@@ -115,9 +115,9 @@ stage-build:
   stage: build
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   tags:
@@ -144,9 +144,9 @@ build:
   tags:
   - deploy-runner
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
     # Set these variables in GitLab CI/CD settings
@@ -168,9 +168,9 @@ staging:
   stage: staging
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   needs: ["stage-build"]
@@ -189,9 +189,9 @@ deploy:
   stage: deploy
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   needs: ["build"]
@@ -211,9 +211,9 @@ stage-stop:
   stage: stop
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   tags:
@@ -231,9 +231,9 @@ stop:
   stage: stop
   image: docker:20.10.16
   services:
-  - docker:dind
+  - docker:dind alias:dockerhost
   variables:
-    DOCKER_HOST: tcp://docker:2375
+    DOCKER_HOST: tcp://dockerhost:2375/
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
   tags:
