@@ -36,6 +36,7 @@ variables:
   variables:
     PIP_DEFAULT_TIMEOUT: 300
   before_script:
+  - apt-get update && apt-get install -y curl
   - curl -sSL https://install.python-poetry.org | python3 -
   - poetry config virtualenvs.create false
   - poetry install
@@ -89,7 +90,7 @@ stage-clean:
   stage: clean
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     - kubectl delete namespace staging --ignore-not-found=true
   tags:
@@ -102,7 +103,7 @@ clean:
   stage: clean
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     - kubectl delete namespace production --ignore-not-found=true
   tags:
@@ -130,7 +131,7 @@ staging:
   stage: staging
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     - kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
     - sed -i "s|__APP_IMAGE__|${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG}|g" k8s/app.yml
@@ -146,7 +147,7 @@ deploy:
   stage: deploy
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     - kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
     - sed -i "s|__APP_IMAGE__|${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG}|g" k8s/app.yml
@@ -162,7 +163,7 @@ stage-stop:
   stage: stop
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     # Add commands to stop or scale down your staging deployment
     - kubectl scale deployment slack-fastapi-app --replicas=0 -n staging
@@ -176,7 +177,7 @@ stop:
   stage: stop
   image: bitnami/kubectl:latest
   script:
-    - echo "$KUBE_CONFIG" > kubeconfig
+    - echo "$KUBE_CONFIG" | base64 -d > kubeconfig
     - export KUBECONFIG=kubeconfig
     # Add commands to stop or scale down your production deployment
     - kubectl scale deployment slack-fastapi-app --replicas=0 -n production
