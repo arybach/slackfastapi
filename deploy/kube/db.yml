@@ -54,6 +54,7 @@ spec:
       containers:
       - name: migrator
         image: slack_fastapi:latest
+        #image: __APP_IMAGE__
         command:
         - "alembic"
         - "upgrade"

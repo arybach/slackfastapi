@@ -17,6 +17,7 @@ spec:
       containers:
       - name: app
         image: slack_fastapi:latest
+        #image: __APP_IMAGE__
         readinessProbe:
           httpGet:
             path: /api/health
