@@ -6,6 +6,13 @@ stages:
 - "deploy"
 - "stop"
 
+services:
+- name: docker:dind
+  alias: docker
+variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+
 .initial-setup:
   stage: test
   image: python:3.10.8-slim-buster
@@ -19,6 +26,7 @@ stages:
   before_script:
   - pip install poetry==1.1.7
   - poetry config virtualenvs.create false
+  - poetry update
   - poetry install
 
 black:
@@ -67,206 +75,102 @@ pytest:
       junit: report.xml
 
 stage-clean:
-  when: manual
   stage: clean
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl delete namespace staging --ignore-not-found=true
   tags:
-  - stage-runner
+    - kubernetes-runner
   environment:
     name: staging
-    action: stop
-  before_script:
-  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
-  script:
-  - docker compose -f deploy/docker-compose.stage.yml --project-directory . down
+  when: manual
 
 clean:
   stage: clean
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl delete namespace production --ignore-not-found=true
   tags:
-  - deploy-runner
+    - kubernetes-runner
   environment:
     name: production
-  before_script:
-  - if [ -n "$ENV" ]; then mv $ENV .env; fi
-  script:
-  - docker compose -f deploy/docker-compose.yml --project-directory . down
-
-.pre-stage-build:
-  before_script:
-  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
-  - >
-    sed -i "s/8000:8000/$DEPLOY_APP_HOST:$DEPLOY_APP_PORT:8000/" deploy/docker-compose.stage.yml
-
-stage-build:
   when: manual
-  stage: build
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  tags:
-  - stage-runner
+
+# Build stages for different environments
+stage-build:
+  <<: *build_definition
   environment:
     name: staging
-    url: $STAGE_URL
-  extends:
-  - .pre-stage-build
-  script:
-  - docker compose -f deploy/docker-compose.stage.yml --project-directory . build
-
-.pre-build:
-  before_script:
-  - if [ -n "$ENV" ]; then mv $ENV .env; fi
-  - >
-    sed -i "s/8000:8000/$DEPLOY_APP_HOST:$DEPLOY_APP_PORT:8000/" deploy/docker-compose.yml
-  - >
-    sed -i "s/8432:5432/$DEPLOY_DB_HOST:$DEPLOY_DB_PORT:5432/" deploy/docker-compose.yml
-
-# .build-template: &build_definition
-#   image:
-#     name: gcr.io/kaniko-project/executor:latest
-#     entrypoint: [""]
-#   script:
-#   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-#   - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-
-# build:
-#   stage: build
-#   image:
-#     name: gcr.io/kaniko-project/executor:v1.14.0-debug
-#     entrypoint: [""]
-#   script:
-#     - echo "{\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}" > /kaniko/.docker/config.json
-#     - /kaniko/executor
-#       --context "${CI_PROJECT_DIR}"
-#       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-#       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
-#   rules:
-#     - if: $CI_COMMIT_TAG
+  variables:
+    IMAGE_TAG: "staging-${CI_COMMIT_REF_SLUG}"
 
 build:
-  stage: build
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  tags:
-  - deploy-runner
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-    # Set these variables in GitLab CI/CD settings
-    CI_REGISTRY_USER: $CI_REGISTRY_USER
-    CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  <<: *build_definition
   environment:
     name: production
-    url: $DEPLOY_URL
-  needs: ["clean"]
-  extends:
-  - .pre-build
-  script:
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
-  - docker-compose -f deploy/docker-compose.yml --project-directory . build
-  - docker-compose -f deploy/docker-compose.yml --project-directory . push slack_fastapi
+  variables:
+    IMAGE_TAG: "production-${CI_COMMIT_REF_SLUG}"
 
 staging:
-  when: manual
   stage: staging
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  needs: ["stage-build"]
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
+    - sed -i "s|__APP_IMAGE__|${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG}|g" k8s/app.yml
+    - kubectl apply -f k8s/app.yml -n staging
   tags:
-  - stage-runner
+    - kubernetes-runner
   environment:
     name: staging
-    url: $STAGE_URL
-    on_stop: stage-stop
-  extends:
-  - .pre-stage-build
-  script:
-  - docker compose -f deploy/docker-compose.stage.yml --project-directory . up -d
+  only:
+    - tags
 
 deploy:
   stage: deploy
-  image: docker:20.10.16
-  services:
-  - docker:dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-  needs: ["build"]
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
+    - sed -i "s|__APP_IMAGE__|${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG}|g" k8s/app.yml
+    - kubectl apply -f k8s/app.yml -n production
   tags:
-  - deploy-runner
+    - kubernetes-runner
   environment:
     name: production
-    url: $DEPLOY_URL
-    on_stop: stop
-  extends:
-  - .pre-build
-  script:
-  - docker compose -f deploy/docker-compose.yml --project-directory . up -d
-
-# __APP_IMAGE__ is what will ba passed to app.yml for deployment
-# create service account and save kube_config as KUBE_CONFIG protected ans masked file variable, then deploy to k8s:
-# deploy:
-#   stage: deploy
-#   image: bitnami/kubectl:latest
-#   script:
-#     - echo "$KUBE_CONFIG" > kubeconfig
-#     - export KUBECONFIG=kubeconfig
-#     - sed -i "s|__APP_IMAGE__|${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_SLUG}|g" k8s/app.yml
-#     - kubectl apply -f k8s/app.yml
-#   tags:
-#     - kubernetes-runner
-#   environment:
-#     name: production
+  only:
+    - main
 
 stage-stop:
-  when: manual
   stage: stop
-  image: docker:20.10.16
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    # Add commands to stop or scale down your staging deployment
+    - kubectl scale deployment slack-fastapi-app --replicas=0 -n staging
   tags:
-  - stage-runner
+    - kubernetes-runner
   environment:
     name: staging
-    action: stop
-  before_script:
-  - if [ -n "$STAGE_ENV" ]; then mv $STAGE_ENV .env; fi
-  script:
-  - docker compose -f deploy/docker-compose.stage.yml --project-directory . down
+  when: manual
 
 stop:
-  when: manual
   stage: stop
-  image: docker:20.10.16
+  image: bitnami/kubectl:latest
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    # Add commands to stop or scale down your production deployment
+    - kubectl scale deployment slack-fastapi-app --replicas=0 -n production
   tags:
-  - deploy-runner
+    - kubernetes-runner
   environment:
     name: production
-    action: stop
-  before_script:
-  - if [ -n "$ENV" ]; then mv $ENV .env; fi
-  script:
-  - docker compose -f deploy/docker-compose.yml --project-directory . down
+  when: manual
