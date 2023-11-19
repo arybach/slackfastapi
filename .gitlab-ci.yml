@@ -38,9 +38,14 @@ variables:
   before_script:
   # - apt-get update && apt-get install -y curl
   # - curl -sSL https://install.python-poetry.org | python3 -
+  - apt-get update && apt-get install -y curl
+  - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+  - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
+  - export YC_CREDENTIALS_FILE=yc_service_account_key.json
   - pip install poetry==1.7.1
   - poetry config virtualenvs.create false
   - poetry install
+
 
 black:
   when: manual
@@ -66,22 +71,22 @@ mypy:
 pytest:
   when: manual
   extends:
-  - .initial-setup
+    - .initial-setup
   services:
-  - name: postgres:13.8-bullseye
-    alias: database
+    - name: postgres:13.8-bullseye
+      alias: database
   variables:
-    # Postgresql variables
     SLACK_FASTAPI_DB_HOST: database
     POSTGRES_PASSWORD: slack_fastapi
     POSTGRES_USER: slack_fastapi
     POSTGRES_DB: slack_fastapi
+  before_script:
+    - apt-get update -y
+    - apt-get install -y libgl1-mesa-dev wait-for-it
   script:
-  - apt update
-  - apt install -y wait-for-it
-  - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
-  - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-  - coverage xml
+    - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
+    - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
+    - coverage xml
   artifacts:
     when: always
     reports:

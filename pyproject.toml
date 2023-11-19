@@ -61,6 +61,13 @@ anyio = "^3.6.1"
 pytest-env = "^0.6.2"
 httpx = "^0.23.0"
 
+[tool.black]
+exclude = '''
+/(
+    jobs\.py
+)/
+'''
+
 [tool.isort]
 profile = "black"
 multi_line_output = 3
