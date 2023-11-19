@@ -3,10 +3,10 @@ name = "slack_fastapi"
 version = "1.0.0"
 description = "RESTful API backend for SlackCutter App"
 authors = [
-    "mats.tumblebuns@gmail.com"
+    "Mats Tumblebuns <mats.tumblebuns@gmail.com>"
 ]
 maintainers = [
-    "mats.tumblebuns@gmail.com"
+    "Mats Tumblebuns <mats.tumblebuns@gmail.com>"
 ]
 readme = "README.md"
 
