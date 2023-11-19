@@ -38,14 +38,17 @@ variables:
   before_script:
   # - apt-get update && apt-get install -y curl
   # - curl -sSL https://install.python-poetry.org | python3 -
-  - apt-get update && apt-get install -y curl
-  - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-  - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
-  - export YC_CREDENTIALS_FILE=yc_service_account_key.json
-  - pip install poetry==1.7.1
-  - poetry config virtualenvs.create false
-  - poetry install
-
+    - apt-get update && apt-get install -y curl gnupg
+    - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+    - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
+    - mkdir -p $HOME/.config/yandex-cloud
+    - cp yc_service_account_key.json $HOME/.config/yandex-cloud/
+    - export YC_CREDENTIALS_FILE=$HOME/.config/yandex-cloud/yc_service_account_key.json
+    - yc config profile create gitlab-ci
+    - yc config set token "$(yc iam create-token)"
+    - pip install poetry==1.7.1
+    - poetry config virtualenvs.create false
+    - poetry install
 
 black:
   when: manual
@@ -83,6 +86,7 @@ pytest:
   before_script:
     - apt-get update -y
     - apt-get install -y libgl1-mesa-dev wait-for-it
+    - pip install pytest  # Explicitly install pytest
   script:
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
     - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
