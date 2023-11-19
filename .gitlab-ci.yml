@@ -24,11 +24,16 @@ variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: "/certs"
 
+.kube-context:
+  image: bitnami/kubectl:latest
+  tags:
+    - kubernetes-runner
+    - deploy-runner
+
 .initial-setup:
   stage: test
   image: python:3.10.8-slim-buster
   tags:
-    - kubernetes-runner
     - docker-runner
   except:
     - tags
@@ -88,6 +93,8 @@ pytest:
 
 stage-clean:
   stage: clean
+  extends:
+  - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
@@ -97,6 +104,8 @@ stage-clean:
 
 clean:
   stage: clean
+  extends:
+  - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
@@ -121,6 +130,8 @@ build:
 
 staging:
   stage: staging
+  extends:
+  - .kube-context
   script:
     - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
@@ -134,6 +145,8 @@ staging:
 
 deploy:
   stage: deploy
+  extends:
+  - .kube-context
   script:
     - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
