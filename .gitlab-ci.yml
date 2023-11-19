@@ -49,13 +49,16 @@ variables:
   #   paths:
   #     - ./deploy/kube/*.yml
 
-# New build job for the pytest Docker image
+# Stage to build the Pytest Docker image
 build-pytest-image:
+  stage: build-image
   <<: *build_definition
   environment:
     name: testing
   variables:
     IMAGE_TAG: "testing-${CI_COMMIT_REF_SLUG}"
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
   only:
     - main
     - tags
@@ -96,24 +99,6 @@ pytest:
   script:
     - docker pull $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
     - docker run --name pytest-container $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-  dependencies:
-    - build-pytest-image
-  only:
-    - main
-    - tags
-
-run-pytest:
-  stage: test
-  image: docker:19.03.12
-  services:
-    - docker:19.03.12-dind
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: "/certs"
-    # Add any environment variables needed for your tests
-  script:
-    - docker pull $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
-    - docker run --name pytest-container $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
   dependencies:
     - build-pytest-image
   only:
