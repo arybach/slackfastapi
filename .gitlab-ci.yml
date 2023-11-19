@@ -28,17 +28,17 @@ variables:
   stage: test
   image: python:3.10.8-slim-buster
   tags:
-  - kubernetes-runner
-  - docker-runner
+    - kubernetes-runner
+    - docker-runner
   except:
-  - tags
+    - tags
   variables:
     PIP_DEFAULT_TIMEOUT: 300
   before_script:
     - apt-get update && apt-get install -y curl gnupg
-    - pip install poetry==1.7.1 Jinja2
+    - pip install poetry==1.7.1
     - poetry config virtualenvs.create false
-    - poetry install
+    - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
 
 black:
   when: manual
@@ -90,8 +90,7 @@ stage-clean:
   stage: clean
   script:
     - rm ./deploy/kube/namespace.yml
-    - git commit -a -m "delete staging manifests"
-    - git push
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
   environment:
     name: staging
   when: manual
@@ -100,8 +99,7 @@ clean:
   stage: clean
   script:
     - rm ./deploy/kube/namespace.yml
-    - git commit -a -m "delete production manifests"
-    - git push
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
   environment:
     name: production
   when: manual
@@ -127,8 +125,10 @@ staging:
     - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
     - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=staging > ./deploy/kube/namespace.yml
-    - git commit -a -m "Update staging manifests"
-    - git push
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
   only:
     - tags
 
@@ -138,7 +138,9 @@ deploy:
     - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
     - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=production > ./deploy/kube/namespace.yml
-    - git commit -a -m "Update production manifests"
-    - git push
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
+    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
   only:
     - main
