@@ -4,7 +4,6 @@ stages:
 - "build"
 - "staging"
 - "deploy"
-- "stop"
 
 # Build template definition
 .build-template: &build_definition
@@ -36,16 +35,7 @@ variables:
   variables:
     PIP_DEFAULT_TIMEOUT: 300
   before_script:
-  # - apt-get update && apt-get install -y curl
-  # - curl -sSL https://install.python-poetry.org | python3 -
     - apt-get update && apt-get install -y curl gnupg
-    # - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-    # # - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
-    # - mkdir -p $HOME/.config/yandex-cloud
-    # - cp yc_service_account_key.json $HOME/.config/yandex-cloud/
-    # - export YC_CREDENTIALS_FILE=$HOME/.config/yandex-cloud/yc_service_account_key.json
-    # - yc config profile create gitlab-ci
-    # - yc config set token "$(yc iam create-token)"
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
     - poetry install
@@ -86,7 +76,7 @@ pytest:
   before_script:
     - apt-get update -y
     - apt-get install -y libgl1-mesa-dev wait-for-it
-    - pip install pytest  # Explicitly install pytest
+    - pip install pytest
   script:
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
     - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
@@ -98,24 +88,20 @@ pytest:
 
 stage-clean:
   stage: clean
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
   script:
-    - kubectl delete namespace staging --ignore-not-found=true
+    - rm ./deploy/kube/namespace.yml
+    - git commit -a -m "delete staging manifests"
+    - git push
   environment:
     name: staging
   when: manual
 
 clean:
   stage: clean
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
   script:
-    - kubectl delete namespace production --ignore-not-found=true
+    - rm ./deploy/kube/namespace.yml
+    - git commit -a -m "delete production manifests"
+    - git push
   environment:
     name: production
   when: manual
@@ -137,52 +123,22 @@ build:
 
 staging:
   stage: staging
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
   script:
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/app.yml
+    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - kubectl create namespace staging --dry-run=client -o yaml | kubectl apply -f -
-    - kubectl apply -f ./deploy/kube/app.yml -n staging
+    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=staging > ./deploy/kube/namespace.yml
+    - git commit -a -m "Update staging manifests"
+    - git push
   only:
     - tags
 
 deploy:
   stage: deploy
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
   script:
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/app.yml
+    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
     - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - kubectl create namespace production --dry-run=client -o yaml | kubectl apply -f -
-    - kubectl apply -f ./deploy/kube/app.yml -n production
+    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=production > ./deploy/kube/namespace.yml
+    - git commit -a -m "Update production manifests"
+    - git push
   only:
     - main
-
-stage-stop:
-  stage: stop
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
-  script:
-    - kubectl scale deployment slack-fastapi-app --replicas=0 -n staging
-  environment:
-    name: staging
-  when: manual
-
-stop:
-  stage: stop
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: [""]
-  extends: [.kube-context]
-  script:
-    - kubectl scale deployment slack-fastapi-app --replicas=0 -n production
-  environment:
-    name: production
-  when: manual

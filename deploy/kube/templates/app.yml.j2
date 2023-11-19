@@ -5,7 +5,7 @@ metadata:
   namespace: slack-fastapi
   name: slack-fastapi-app
 spec:
-  replicas: 2
+  replicas: "{{num_replicas}}"
   selector:
     matchLabels:
       app: slack-fastapi-app
