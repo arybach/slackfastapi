@@ -39,13 +39,13 @@ variables:
   # - apt-get update && apt-get install -y curl
   # - curl -sSL https://install.python-poetry.org | python3 -
     - apt-get update && apt-get install -y curl gnupg
-    - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-    - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
-    - mkdir -p $HOME/.config/yandex-cloud
-    - cp yc_service_account_key.json $HOME/.config/yandex-cloud/
-    - export YC_CREDENTIALS_FILE=$HOME/.config/yandex-cloud/yc_service_account_key.json
-    - yc config profile create gitlab-ci
-    - yc config set token "$(yc iam create-token)"
+    # - curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+    # # - echo "$YC_SERVICE_ACCOUNT_KEY" | base64 -d > yc_service_account_key.json
+    # - mkdir -p $HOME/.config/yandex-cloud
+    # - cp yc_service_account_key.json $HOME/.config/yandex-cloud/
+    # - export YC_CREDENTIALS_FILE=$HOME/.config/yandex-cloud/yc_service_account_key.json
+    # - yc config profile create gitlab-ci
+    # - yc config set token "$(yc iam create-token)"
     - pip install poetry==1.7.1
     - poetry config virtualenvs.create false
     - poetry install
