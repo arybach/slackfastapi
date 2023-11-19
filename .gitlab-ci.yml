@@ -101,6 +101,8 @@ stage-clean:
   environment:
     name: staging
   when: manual
+  dependencies:
+    - .initial-setup
 
 clean:
   stage: clean
@@ -112,6 +114,8 @@ clean:
   environment:
     name: production
   when: manual
+  dependencies:
+    - .initial-setup
 
 # Build stages for different environments
 stage-build:
@@ -142,6 +146,8 @@ staging:
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
   only:
     - tags
+  dependencies:
+    - .initial-setup
 
 deploy:
   stage: deploy
@@ -157,3 +163,5 @@ deploy:
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
   only:
     - main
+  dependencies:
+    - .initial-setup
