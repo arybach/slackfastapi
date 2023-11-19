@@ -105,7 +105,7 @@ stage-clean:
     name: staging
   when: manual
   dependencies:
-    - .initial-setup
+    - pytest
 
 clean:
   stage: clean
@@ -118,7 +118,7 @@ clean:
     name: production
   when: manual
   dependencies:
-    - .initial-setup
+    - pytest
 
 # Build stages for different environments
 stage-build:
@@ -150,7 +150,7 @@ staging:
   only:
     - tags
   dependencies:
-    - .initial-setup
+    - pytest
 
 deploy:
   stage: deploy
@@ -167,4 +167,4 @@ deploy:
   only:
     - main
   dependencies:
-    - .initial-setup
+    - pytest
