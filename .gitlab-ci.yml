@@ -1,9 +1,19 @@
 stages:
+- "build-image"
 - "test"
 - "clean"
 - "build"
 - "staging"
 - "deploy"
+
+.docker-build-template: &docker_build_definition
+  stage: build-image
+  image:
+    name: gcr.io/kaniko-project/executor:v1.14.0-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
 
 # Build template definition
 .build-template: &build_definition
@@ -44,9 +54,16 @@ variables:
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
     - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
-  artifacts:
-    paths:
-      - ./deploy/kube/*.yml
+  # artifacts:
+  #   paths:
+  #     - ./deploy/kube/*.yml
+
+# New build job for the pytest Docker image
+build-pytest-image:
+  <<: *docker_build_definition
+  only:
+    - main
+    - tags
 
 black:
   when: manual
@@ -70,29 +87,46 @@ mypy:
   - mypy .
 
 pytest:
-  when: manual
-  extends:
-    - .initial-setup
+  stage: test
+  image: docker:19.03.12
   services:
-    - name: postgres:13.8-bullseye
-      alias: database
+    - docker:19.03.12-dind
   variables:
-    SLACK_FASTAPI_DB_HOST: database
-    POSTGRES_PASSWORD: slack_fastapi
-    POSTGRES_USER: slack_fastapi
-    POSTGRES_DB: slack_fastapi
-  before_script:
-    - apt-get update -y
-    - apt-get install -y libgl1-mesa-dev wait-for-it
-    - pip install pytest
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: "/certs"
   script:
-    - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
-    - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-    - coverage xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
+    - docker pull $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
+    - docker run --name pytest-container -e SLACK_FASTAPI_DB_HOST=database -e POSTGRES_PASSWORD=slack_fastapi -e POSTGRES_USER=slack_fastapi -e POSTGRES_DB=slack_fastapi $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
+  dependencies:
+    - build-pytest-image
+  only:
+    - main
+    - tags
+
+# pytest:
+#   when: manual
+#   extends:
+#     - .initial-setup
+#   services:
+#     - name: postgres:13.8-bullseye
+#       alias: database
+#   variables:
+#     SLACK_FASTAPI_DB_HOST: database
+#     POSTGRES_PASSWORD: slack_fastapi
+#     POSTGRES_USER: slack_fastapi
+#     POSTGRES_DB: slack_fastapi
+#   before_script:
+#     - apt-get update -y
+#     - apt-get install -y libgl1-mesa-dev wait-for-it
+#     - pip install pytest
+#   script:
+#     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
+#     - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
+#     - coverage xml
+#   artifacts:
+#     when: always
+#     reports:
+#       junit: report.xml
 
 stage-clean:
   stage: clean
@@ -105,7 +139,7 @@ stage-clean:
     name: staging
   when: manual
   dependencies:
-    - pytest
+    - black
 
 clean:
   stage: clean
@@ -118,7 +152,7 @@ clean:
     name: production
   when: manual
   dependencies:
-    - pytest
+    - black
 
 # Build stages for different environments
 stage-build:
@@ -150,7 +184,7 @@ staging:
   only:
     - tags
   dependencies:
-    - pytest
+    - black
 
 deploy:
   stage: deploy
@@ -167,4 +201,4 @@ deploy:
   only:
     - main
   dependencies:
-    - pytest
+    - black
