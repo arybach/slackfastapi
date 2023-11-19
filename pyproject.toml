@@ -3,12 +3,10 @@ name = "slack_fastapi"
 version = "1.0.0"
 description = "RESTful API backend for SlackCutter App"
 authors = [
-    "RoyalGoose",
-    "Daniel"
+    "mats.tumblebuns@gmail.com"
 ]
 maintainers = [
-    "RoyalGoose",
-    "Daniel"
+    "mats.tumblebuns@gmail.com"
 ]
 readme = "README.md"
 
@@ -62,11 +60,7 @@ pytest-env = "^0.6.2"
 httpx = "^0.23.0"
 
 [tool.black]
-exclude = '''
-/(
-    jobs\.py
-)/
-'''
+exclude = 'jobs\.py'
 
 [tool.isort]
 profile = "black"
