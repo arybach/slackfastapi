@@ -62,14 +62,16 @@ variables:
   #     - ./deploy/kube/*.yml
 
 # New build job for the pytest Docker image
-# Job that uses the Docker build template to build the Pytest image
 build-pytest-image:
   <<: *docker_build_definition
+  script:
+    - echo "Listing project directory contents for debugging..."
+    - ls -la $CI_PROJECT_DIR
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
   only:
     - main
     - tags
-  tags:
-    - kubernetes-runner
 
 black:
   when: manual
