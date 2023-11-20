@@ -11,6 +11,9 @@ from slack_fastapi.settings import settings
 from slack_fastapi.web.api.dummy.views import (
     router as dummy_router,  # Import dummy router for tests
 )
+from slack_fastapi.web.api.echo.views import (
+    router as echo_router,  # Import echo router for tests
+)
 from slack_fastapi.web.api.router import api_router
 from slack_fastapi.web.lifetime import register_shutdown_event, register_startup_event
 
@@ -54,6 +57,9 @@ def get_app() -> FastAPI:
 
     # Include the dummy router with a specific path prefix for tests
     app.include_router(dummy_router, prefix="/dummy", tags=["dummy"])
+
+    # Include the echo router with a specific path prefix for tests
+    app.include_router(echo_router, prefix="/echo", tags=["echo"])
 
     @app.middleware("http")
     async def log_requests(request: Request, call_next: Any):  # type: ignore # noqa: WPS430, E501
