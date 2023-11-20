@@ -106,8 +106,8 @@ mypy:
 
 pytest:
   stage: test
-  # extends:
-  #   - .initial-setup
+  extends:
+    - .initial-setup
   services:
     - name: postgres:13.8-bullseye
       alias: database
