@@ -46,7 +46,7 @@ variables:
 
 .initial-setup:
   stage: test
-  image: python:3.10.8-slim-buster
+  image: python:3.10.13-slim-buster
   tags:
     - docker-runner
   except:
@@ -126,6 +126,7 @@ pytest:
     - poetry install
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
     - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
+    - ls -la
     - coverage xml
 
   artifacts:

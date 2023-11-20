@@ -3310,10 +3310,7 @@ files = [
 flake8 = ">=3.9"
 tokenize-rt = ">=2.1"
 
-[extras]
-dev = []
-
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b6300cd4bedcb50ea5b9e5e444f1610073370b5aad0e73cfb79d552c9eec415b"
+content-hash = "2e622080fe6abab3332e7a9e661acf9b682206004c02cda30566c4ef5d9c70f1"
