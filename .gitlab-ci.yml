@@ -57,7 +57,7 @@ variables:
     - apt-get update && apt-get install -y curl gnupg
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
-    - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
+#    - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
 
   # artifacts:
   #   paths:
@@ -121,11 +121,11 @@ pytest:
   before_script:
     - apt-get update -y
     - apt-get install -y libgl1-mesa-dev wait-for-it
-    - pip install pytest pytest-cov fastapi httpx sqlalchemy
+    - poetry install -E all
   script:
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
-    - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-    - coverage xml
+    - poetry run pytest -vv --junitxml=report.xml --cov="slack_fastapi"
+    - poetry run coverage xml
   artifacts:
     when: always
     reports:
