@@ -8,6 +8,9 @@ from fastapi.responses import UJSONResponse
 from slack_fastapi.logger.services import LoggerMiddleware
 from slack_fastapi.logging import configure_logging
 from slack_fastapi.settings import settings
+from slack_fastapi.web.api.dummy.views import (
+    router as dummy_router,  # Import dummy router for tests
+)
 from slack_fastapi.web.api.router import api_router
 from slack_fastapi.web.lifetime import register_shutdown_event, register_startup_event
 
@@ -48,6 +51,9 @@ def get_app() -> FastAPI:
 
     # Main router for the API.
     app.include_router(router=api_router, prefix="/api")
+
+    # Include the dummy router with a specific path prefix for tests
+    app.include_router(dummy_router, prefix="/dummy", tags=["dummy"])
 
     @app.middleware("http")
     async def log_requests(request: Request, call_next: Any):  # type: ignore # noqa: WPS430, E501
