@@ -6,6 +6,20 @@ stages:
 - "staging"
 - "deploy"
 
+# Stage to build the Pytest Docker image
+build-pytest-image:
+  stage: build-image
+  <<: *build_definition
+  environment:
+    name: testing
+  variables:
+    IMAGE_TAG: "testing-${CI_COMMIT_REF_SLUG}"
+  script:
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
+  only:
+    - main
+    - tags
+
 # Build template definition
 .build-template: &build_definition
   stage: build
@@ -49,19 +63,6 @@ variables:
   #   paths:
   #     - ./deploy/kube/*.yml
 
-# Stage to build the Pytest Docker image
-build-pytest-image:
-  stage: build-image
-  <<: *build_definition
-  environment:
-    name: testing
-  variables:
-    IMAGE_TAG: "testing-${CI_COMMIT_REF_SLUG}"
-  script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
-  only:
-    - main
-    - tags
 
 black:
   when: manual
