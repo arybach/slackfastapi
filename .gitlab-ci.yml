@@ -122,9 +122,8 @@ pytest:
     - apt-get install -y libgl1-mesa-dev wait-for-it
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
-    # - pip install pytest pytest-cov fastapi httpx
   script:
-    - poetry install -E all
+    - poetry install
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
     - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
     - coverage xml
