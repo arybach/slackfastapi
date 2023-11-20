@@ -17,20 +17,6 @@ stages:
   tags:
     - kubernetes-runner
 
-# # Stage to build the Pytest Docker image
-# build-pytest-image:
-#   stage: build-image
-#   <<: *build_definition
-#   environment:
-#     name: testing
-#   variables:
-#     IMAGE_TAG: "testing-${CI_COMMIT_REF_SLUG}"
-#   script:
-#     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile.pytest --destination $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
-#   only:
-#     - main
-#     - tags
-
 services:
 - name: docker:dind
   alias: docker
@@ -57,7 +43,7 @@ variables:
     - apt-get update && apt-get install -y curl gnupg
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
-    # - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
+    - poetry install
   # artifacts:
   #   paths:
   #     - ./deploy/kube/*.yml
@@ -83,26 +69,6 @@ mypy:
   script:
   - mypy .
 
-# pytest:
-#   stage: test
-#   image: docker:19.03.12
-#   services:
-#     - docker:19.03.12-dind
-#   variables:
-#     DOCKER_HOST: tcp://docker:2375
-#     DOCKER_TLS_CERTDIR: "/certs"
-#     SLACK_FASTAPI_DB_HOST: database
-#     POSTGRES_PASSWORD: slack_fastapi
-#     POSTGRES_USER: slack_fastapi
-#     POSTGRES_DB: slack_fastapi
-#   script:
-#     - docker pull $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG
-#     - docker run --name pytest-container $CI_REGISTRY_IMAGE:pytest-$CI_COMMIT_REF_SLUG pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-#   dependencies:
-#     - build-pytest-image
-#   only:
-#     - main
-#     - tags
 
 pytest:
   stage: test
@@ -160,6 +126,26 @@ clean:
   dependencies:
     - pytest
 
+# Pre-Build stage for processing Jinja templates
+process-stage-templates:
+  stage: staging
+  image: python:3.10.8-slim-buster
+  script:
+    - pip install Jinja2
+    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
+    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
+    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=staging > ./deploy/kube/namespace.yml
+
+# Pre-Build stage for processing Jinja templates
+process-prod-templates:
+  stage: deploy
+  image: python:3.10.8-slim-buster
+  script:
+    - pip install Jinja2
+    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
+    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
+    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=production > ./deploy/kube/namespace.yml
+
 # Build stages for different environments
 stage-build:
   <<: *build_definition
@@ -180,9 +166,6 @@ staging:
   extends:
   - .kube-context
   script:
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
-    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=staging > ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
@@ -191,15 +174,13 @@ staging:
     - tags
   dependencies:
     - pytest
+    - process-stage-templates
 
 deploy:
   stage: deploy
   extends:
   - .kube-context
   script:
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
-    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=production > ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
@@ -208,3 +189,4 @@ deploy:
     - main
   dependencies:
     - pytest
+    - process-prod-templates
