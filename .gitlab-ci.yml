@@ -55,7 +55,7 @@ variables:
     PIP_DEFAULT_TIMEOUT: 300
   before_script:
     - apt-get update && apt-get install -y curl gnupg
-    - pip install poetry==1.7.1 Jinja2 fastapi
+    - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
     - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
 
@@ -121,11 +121,13 @@ pytest:
   before_script:
     - apt-get update -y
     - apt-get install -y libgl1-mesa-dev wait-for-it
-    - pip install pytest pytest-cov
+    - poetry install pytest pytest-cov
   script:
+    # - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
+    # - coverage xml
     - wait-for-it -t 180 $SLACK_FASTAPI_DB_HOST:5432
-    - pytest -vv --junitxml=report.xml --cov="slack_fastapi" .
-    - coverage xml
+    - poetry run pytest -vv --junitxml=report.xml --cov="slack_fastapi"
+    - poetry run coverage xml
   artifacts:
     when: always
     reports:
