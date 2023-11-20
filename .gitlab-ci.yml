@@ -106,8 +106,8 @@ mypy:
 
 pytest:
   stage: test
-  extends:
-    - .initial-setup
+  # extends:
+  #   - .initial-setup
   services:
     - name: postgres:13.8-bullseye
       alias: database
@@ -120,6 +120,8 @@ pytest:
   before_script:
     - apt-get update -y
     - apt-get install -y libgl1-mesa-dev wait-for-it
+    - pip install poetry==1.7.1 Jinja2
+    - poetry config virtualenvs.create false
     # - pip install pytest pytest-cov fastapi httpx
   script:
     - poetry install -E all
