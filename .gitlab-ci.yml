@@ -55,10 +55,10 @@ variables:
     PIP_DEFAULT_TIMEOUT: 300
   before_script:
     - apt-get update && apt-get install -y curl gnupg
-    - pip install poetry==1.7.1 Jinja2
+    - pip install poetry==1.7.1 Jinja2 fastapi
     - poetry config virtualenvs.create false
-    - poetry add fastapi
     - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
+
   # artifacts:
   #   paths:
   #     - ./deploy/kube/*.yml
