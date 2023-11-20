@@ -6,6 +6,18 @@ stages:
 - "staging"
 - "deploy"
 
+# Build template definition
+.build-template: &build_definition
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:v1.14.0-debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  tags:
+    - kubernetes-runner
+
 # Stage to build the Pytest Docker image
 build-pytest-image:
   stage: build-image
@@ -19,18 +31,6 @@ build-pytest-image:
   only:
     - main
     - tags
-
-# Build template definition
-.build-template: &build_definition
-  stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:v1.14.0-debug
-    entrypoint: [""]
-  script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  tags:
-    - kubernetes-runner
 
 services:
 - name: docker:dind
