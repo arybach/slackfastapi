@@ -46,7 +46,7 @@ variables:
 
 .initial-setup:
   stage: test
-  image: python:3.10-slim-buster
+  image: python:3.10.8-slim-buster
   tags:
     - docker-runner
   except:
