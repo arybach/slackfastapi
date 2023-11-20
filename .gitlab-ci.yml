@@ -57,6 +57,7 @@ variables:
     - apt-get update && apt-get install -y curl gnupg
     - pip install poetry==1.7.1 Jinja2
     - poetry config virtualenvs.create false
+    - poetry add fastapi
     - poetry install -E all  # Ensure all extras, including dev dependencies, are installed
   # artifacts:
   #   paths:
