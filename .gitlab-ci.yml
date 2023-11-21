@@ -161,6 +161,7 @@ staging:
   extends:
   - .kube-context
   script:
+    - kubectl config get-contexts
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
     - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
@@ -176,10 +177,12 @@ deploy:
   extends:
   - .kube-context
   script:
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
+    - kubectl config get-contexts
+    - kubectl apply -f ./deploy/kube/namespace.yml
+    - kubectl apply -f ./deploy/kube/db.yml
+    - kubectl apply -f ./deploy/kube/app.yml
+    - kubectl apply -f ./deploy/kube/rabbit.yml
+  # --context $KUBE_CONTEXT
   only:
     - main
   dependencies:

@@ -5,7 +5,7 @@ import os
 import jinja2
 
 
-def process_templates(app_image_tag, num_replicas, namespace_name):
+def process_templates(app_image_tag, num_replicas, namespace_name) -> None:
     """Process Jinja2 templates for Kubernetes manifests."""
     template_loader = jinja2.FileSystemLoader(searchpath="./deploy/kube/templates/")
     template_env = jinja2.Environment(loader=template_loader)
