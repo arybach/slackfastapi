@@ -132,19 +132,14 @@ process-stage-templates:
   image: python:3.10.8-slim-buster
   script:
     - pip install Jinja2
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
-    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:staging-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=staging > ./deploy/kube/namespace.yml
+    - python jinja_processing.py --num_replicas=2 --namespace=staging
 
-# Pre-Build stage for processing Jinja templates
 process-prod-templates:
   stage: deploy
   image: python:3.10.8-slim-buster
   script:
     - pip install Jinja2
-    - jinja2 ./deploy/kube/templates/app.yml.j2 -D app_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} -D num_replicas=2 > ./deploy/kube/app.yml
-    - jinja2 ./deploy/kube/templates/db.yml.j2 -D db_image=${CI_REGISTRY_IMAGE}:production-${CI_COMMIT_REF_SLUG} > ./deploy/kube/db.yml
-    - jinja2 ./deploy/kube/templates/namespace.yml.j2 -D namespace_name=production > ./deploy/kube/namespace.yml
+    - python jinja_processing.py --num_replicas=2 --namespace=production
 
 # Build stages for different environments
 stage-build:
@@ -190,3 +185,28 @@ deploy:
   dependencies:
     - pytest
     - process-prod-templates
+
+# Stop tasks for staging and production environments
+stage-stop:
+  stage: staging
+  image: python:3.10.8-slim-buster
+  script:
+    - pip install Jinja2
+    - python jinja_processing.py --num_replicas=0 --namespace=staging
+  dependencies:
+    - pytest
+  only:
+    - tags
+  when: manual
+
+stop:
+  stage: deploy
+  image: python:3.10.8-slim-buster
+  script:
+    - pip install Jinja2
+    - python jinja_processing.py --num_replicas=0 --namespace=production
+  dependencies:
+    - pytest
+  only:
+    - main
+  when: manual

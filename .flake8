@@ -81,7 +81,7 @@ ignore =
 
 per-file-ignores =
   ; all tests
-  test_*.py,tests.py,tests_*.py,*/tests/*,conftest.py:
+  test_*.py,tests.py,tests_*.py,*/tests/*,conftest.py,jinja_processing.py:
   ; Use of assert detected
   S101,
   ; Found outer scope names shadowing
@@ -96,6 +96,10 @@ per-file-ignores =
   WPS211,
   ; Found wrong function call
   WPS421,
+  ; Found block variables overlap
+  WPS440,
+  ; By default, jinja2 sets autoescape to False. Consider using autoescape=True or use the select_autoescape function to mitigate XSS vulnerabilities.
+  S701
 
   ; all init files
   __init__.py:
