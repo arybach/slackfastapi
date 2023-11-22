@@ -51,6 +51,8 @@ spec:
   ttlSecondsAfterFinished: 100
   template:
     spec:
+      imagePullSecrets:
+      - name: registrykey
       containers:
       - name: migrator
         image: solarwinds123.ru:5050/slackfastapi/slackfastapi:main

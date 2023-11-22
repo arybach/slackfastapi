@@ -106,7 +106,7 @@ stage-clean:
   - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
+    - kubectl apply -f ./deploy/kube/*.yml
   environment:
     name: staging
   when: manual
@@ -119,7 +119,7 @@ clean:
   - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/*.yml
+    - kubectl apply -f ./deploy/kube/*.yml
   environment:
     name: production
   when: manual
@@ -162,10 +162,10 @@ staging:
   - .kube-context
   script:
     - kubectl config get-contexts
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/namespace.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/db.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/app.yml
-    - kubectl --context $KUBE_CONTEXT apply -f ./deploy/kube/rabbit.yml
+    - kubectl apply -f ./deploy/kube/namespace.yml
+    - kubectl apply -f ./deploy/kube/db.yml
+    - kubectl apply -f ./deploy/kube/app.yml
+    - kubectl apply -f ./deploy/kube/rabbit.yml
   only:
     - tags
   dependencies:

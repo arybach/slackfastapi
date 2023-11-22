@@ -51,6 +51,8 @@ spec:
   ttlSecondsAfterFinished: 100
   template:
     spec:
+      imagePullSecrets:
+      - name: registrykey
       containers:
       - name: migrator
         # image: slack_fastapi:latest

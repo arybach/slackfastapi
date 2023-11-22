@@ -14,6 +14,8 @@ spec:
       labels:
         app: slack-fastapi-app
     spec:
+      imagePullSecrets:
+      - name: registrykey
       containers:
       - name: app
         #image: slack_fastapi:latest
