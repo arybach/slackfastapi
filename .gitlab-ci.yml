@@ -106,7 +106,7 @@ stage-clean:
   - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
-    - kubectl apply -f ./deploy/kube/*.yml
+    - kubectl apply -f ./deploy/kube
   environment:
     name: staging
   when: manual
@@ -119,7 +119,7 @@ clean:
   - .kube-context
   script:
     - rm ./deploy/kube/namespace.yml
-    - kubectl apply -f ./deploy/kube/*.yml
+    - kubectl apply -f ./deploy/kube
   environment:
     name: production
   when: manual
