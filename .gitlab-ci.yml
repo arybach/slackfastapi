@@ -162,6 +162,7 @@ staging:
   - .kube-context
   script:
     - kubectl config get-contexts
+    - kubectl delete job slack-fastapi-migrator -n slack-fastapi --ignore-not-found
     - kubectl apply -f ./deploy/kube/namespace.yml
     - kubectl apply -f ./deploy/kube/db.yml
     - kubectl apply -f ./deploy/kube/app.yml
@@ -178,6 +179,7 @@ deploy:
   - .kube-context
   script:
     - kubectl config get-contexts
+    - kubectl delete job slack-fastapi-migrator -n slack-fastapi --ignore-not-found
     - kubectl apply -f ./deploy/kube/namespace.yml
     - kubectl apply -f ./deploy/kube/db.yml
     - kubectl apply -f ./deploy/kube/app.yml
