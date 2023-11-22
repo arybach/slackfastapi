@@ -53,7 +53,7 @@ spec:
     spec:
       containers:
       - name: migrator
-        image: slack_fastapi:latest
+        image: solarwinds123.ru:5050/slackfastapi/slackfastapi:main
         #image: __APP_IMAGE__
         command:
         - "alembic"
