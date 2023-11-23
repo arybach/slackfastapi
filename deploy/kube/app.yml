@@ -63,9 +63,13 @@ metadata:
   namespace: slack-fastapi
   labels:
     name: slack-fastapi-app
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-issuer"
 spec:
   rules:
-#  - host: slack-fastapi.local
+  # - host: slack-fastapi.local
     - host: api.solarwinds123.ru
       http:
         paths:
@@ -75,9 +79,9 @@ spec:
               service:
                 name: slack-fastapi-app-service
                 port:
-                  name: api-port
+                  number: 80
   tls:
     - hosts:
         - api.solarwinds123.ru
-      secretName: slack-fastapi-app-tls
+      secretName: api-solarwinds123-ru-tls
 ---
