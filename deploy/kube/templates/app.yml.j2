@@ -56,24 +56,3 @@ spec:
     name: api-port
 
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: slack-fastapi-app
-  namespace: slack-fastapi
-  labels:
-    name: slack-fastapi-app
-spec:
-  rules:
-  - host: slack-fastapi.local
-    http:
-      paths:
-      - pathType: Prefix
-        path: "/"
-        backend:
-          service:
-            name: slack-fastapi-app-service
-            port:
-              name: api-port
-
----

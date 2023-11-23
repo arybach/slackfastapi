@@ -106,8 +106,7 @@ stage-clean:
   extends:
   - .kube-context
   script:
-    - rm ./deploy/kube/namespace.yml
-    - kubectl apply -f ./deploy/kube
+    - kubectl delete namespace slack_fastapi --ignore-not-found
   environment:
     name: staging
   when: manual
@@ -119,8 +118,7 @@ clean:
   extends:
   - .kube-context
   script:
-    - rm ./deploy/kube/namespace.yml
-    - kubectl apply -f ./deploy/kube
+    - kubectl delete namespace slack_fastapi --ignore-not-found
   environment:
     name: production
   when: manual
