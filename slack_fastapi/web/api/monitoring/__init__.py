@@ -1,4 +1,4 @@
 """API for checking project status."""
-from monitoring.views import router
+from slack_fastapi.web.api.monitoring.health_router import router
 
 __all__ = ["router"]
