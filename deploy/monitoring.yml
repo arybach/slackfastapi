@@ -1,0 +1,101 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fastapi-monitor
+  namespace: prometheus
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app: slack-fastapi-app # FastAPI pods label
+  namespaceSelector:
+    matchNames:
+      - slack-fastapi # FastAPI app namespace
+  endpoints:
+    - port: "8000" # Port where FastAPI app is running
+      interval: 15s # Scrape interval
+      path: "/metrics" # Path where metrics are exposed
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+  namespace: slack-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: wrouesnel/postgres_exporter
+        env:
+        - name: DATA_SOURCE_NAME
+          value: postgresql://<username>:<password>@slack-fastapi-db-service:5432/?sslmode=disable
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgres-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  namespaceSelector:
+    matchNames:
+      - slack-fastapi
+  endpoints:
+  - port: "9187" # Default port for PostgreSQL Exporter
+    interval: 15s
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-exporter
+  namespace: slack-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq-exporter
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-exporter
+    spec:
+      containers:
+      - name: rabbitmq-exporter
+        image: kbudde/rabbitmq-exporter
+        env:
+        - name: RABBIT_URL
+          value: "http://slack-fastapi-rmq-service:15672" # URL of RabbitMQ management plugin
+        - name: RABBIT_USER
+          value: "guest" # Default user, replace if you have different credentials
+        - name: RABBIT_PASSWORD
+          value: "guest" # Default password, replace if you have different credentials
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: rabbitmq-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: rabbitmq-exporter
+  namespaceSelector:
+    matchNames:
+      - slack-fastapi
+  endpoints:
+  - port: "9419" # Default port for RabbitMQ Exporter
+    interval: 15s

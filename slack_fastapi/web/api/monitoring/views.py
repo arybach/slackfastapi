@@ -1,12 +1,22 @@
-from fastapi import APIRouter
+from typing import Dict
 
-router = APIRouter()
+from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
+
+app = FastAPI()
+
+# Instrument the application
+Instrumentator().instrument(app).expose(app)
 
 
-@router.get("/health")
-def health_check() -> None:
+@app.get("/health")
+def health_check() -> Dict[str, str]:
     """
-    Checks the health of a project.
+    Checks the health of the project.
 
-    It returns 200 if the project is healthy.
+    Returns:
+        Dict[str, str]: A dictionary with the health status of the project.
+        The dictionary contains:
+        - 'status': A string indicating the health status ('healthy').
     """
+    return {"status": "healthy"}
