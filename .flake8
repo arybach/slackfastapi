@@ -36,6 +36,10 @@ ignore =
   WPS115,
   ; Found nested function
   WPS602,
+  ; Found nested function
+  WPS430
+  ; Found too many expressions
+  WPS213
   ; Found method without arguments
   WPS605,
   ; Found overused expression

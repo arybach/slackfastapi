@@ -1,11 +1,18 @@
-from fastapi import FastAPI
-from health_router import router as health_router  # Import the router
-from prometheus_fastapi_instrumentator import Instrumentator
+from typing import Dict
 
-app = FastAPI()
+from fastapi import APIRouter
 
-# Instrument the application
-Instrumentator().instrument(app).expose(app)
+router = APIRouter()
 
-# Include the health check router
-app.include_router(health_router)
+
+@router.get("/health")
+def health_check() -> Dict[str, str]:
+    """
+    Checks the health of the project.
+
+    :returns:
+        Dict[str, str]: A dictionary with the health status of the project.
+        The dictionary contains:
+        - 'status': A string indicating the health status ('healthy').
+    """
+    return {"status": "healthy"}
