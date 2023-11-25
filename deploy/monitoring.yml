@@ -112,7 +112,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: prometheus
-  namespace: prometheus  # Change this to the namespace of the Prometheus service
+  namespace: prometheus  # Set to the namespace of the Prometheus service
   labels:
     name: prometheus
   annotations:
