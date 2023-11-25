@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     with environment variables.
     """
 
-    host: str = "127.0.0.1"
+    host: str = "0.0.0.0"
     port: int = 8000
     # quantity of workers for uvicorn
     workers_count: int = 1
@@ -56,7 +56,7 @@ class Settings(BaseSettings):
         return "".join(
             [
                 "FastAPI backend for SlackCutter application\n\n",
-                "Backend responsible: [@royalgoose](https://t.me/royalgoose)",
+                "Backend responsible: mats.tumblebuns@gmail.com\n\n",
             ],
         )
 
@@ -125,7 +125,7 @@ class Settings(BaseSettings):
     # S3 Bucket settings
     s3_region: str = "us-east-1"
     s3_bucket: str = "slackcutter-backend-dev"
-    s3_prefix: str = "/preifx"
+    s3_prefix: str = "/prefix"
     s3_endpoint_url: str = "https://slackcutter-backend-dev.s3.amazonaws.com"
     s3_access_key: str = "access_key"
     s3_secret_key: str = "secret_key"

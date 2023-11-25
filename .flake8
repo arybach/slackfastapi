@@ -82,6 +82,8 @@ ignore =
   D102,
   ; Found magic number
   WPS432,
+  ; Possible binding to all interfaces
+  S104,
 
 per-file-ignores =
   ; all tests

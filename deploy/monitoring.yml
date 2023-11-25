@@ -1,4 +1,5 @@
 ---
+# ServiceMonitor for FastAPI
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -9,16 +10,17 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: slack-fastapi-app # FastAPI pods label
+      app: slack-fastapi-app
   namespaceSelector:
     matchNames:
-      - slack-fastapi # FastAPI app namespace
+      - slack-fastapi
   endpoints:
-    - port: "8000" # Port where FastAPI app is running
-      interval: 15s # Scrape interval
-      path: "/metrics" # Path where metrics are exposed
+    - port: "8000"
+      interval: 15s
+      path: "/metrics"
 
 ---
+# Deployment for Postgres Exporter
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,8 +41,10 @@ spec:
         image: wrouesnel/postgres_exporter
         env:
         - name: DATA_SOURCE_NAME
-          value: postgresql://<username>:<password>@slack-fastapi-db-service:5432/?sslmode=disable
+          value: postgresql://slack-fastapi:slack-fastapi@slack-fastapi-db-service:5432/?sslmode=disable
+
 ---
+# ServiceMonitor for Postgres Exporter
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -54,9 +58,11 @@ spec:
     matchNames:
       - slack-fastapi
   endpoints:
-  - port: "9187" # Default port for PostgreSQL Exporter
+  - port: "9187"
     interval: 15s
+
 ---
+# Deployment for RabbitMQ Exporter
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -77,13 +83,13 @@ spec:
         image: kbudde/rabbitmq-exporter
         env:
         - name: RABBIT_URL
-          value: "http://slack-fastapi-rmq-service:15672" # URL of RabbitMQ management plugin
+          value: "http://slack-fastapi-rmq-service:15672"
         - name: RABBIT_USER
-          value: "guest" # Default user, replace if you have different credentials
+          value: "guest"
         - name: RABBIT_PASSWORD
-          value: "guest" # Default password, replace if you have different credentials
-
+          value: "guest"
 ---
+# ServiceMonitor for RabbitMQ Exporter
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -97,5 +103,64 @@ spec:
     matchNames:
       - slack-fastapi
   endpoints:
-  - port: "9419" # Default port for RabbitMQ Exporter
+  - port: "9419"
     interval: 15s
+
+---
+# Ingress for Prometheus
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus
+  namespace: prometheus  # Change this to the namespace of the Prometheus service
+  labels:
+    name: prometheus
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+spec:
+  rules:
+    - host: prometheus.solarwinds123.ru
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: kube-prom-stack-kube-prome-prometheus
+                port:
+                  number: 9090
+  tls:
+    - hosts:
+        - prometheus.solarwinds123.ru
+      secretName: api-solarwinds123-ru-tls
+---
+# Ingress for Grafana
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  namespace: prometheus  # Change this to the namespace of the Grafana service
+  labels:
+    name: grafana
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+spec:
+  rules:
+    - host: grafana.solarwinds123.ru
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: kube-prom-stack-grafana
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - grafana.solarwinds123.ru
+      secretName: api-solarwinds123-ru-tls
