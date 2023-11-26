@@ -16,7 +16,7 @@ spec:
       - slack-fastapi
   endpoints:
     - port: "8000"
-      interval: 15s
+      interval: 30s
       path: "/metrics"
 
 ---
@@ -59,7 +59,7 @@ spec:
       - slack-fastapi
   endpoints:
   - port: "9187"
-    interval: 15s
+    interval: 30s
 
 ---
 # Deployment for RabbitMQ Exporter
@@ -104,7 +104,7 @@ spec:
       - slack-fastapi
   endpoints:
   - port: "9419"
-    interval: 15s
+    interval: 30s
 
 ---
 # Ingress for Prometheus
@@ -134,7 +134,7 @@ spec:
   tls:
     - hosts:
         - prometheus.solarwinds123.ru
-      secretName: api-solarwinds123-ru-tls
+      secretName: prometheus-tls
 ---
 # Ingress for Grafana
 apiVersion: networking.k8s.io/v1
@@ -163,4 +163,4 @@ spec:
   tls:
     - hosts:
         - grafana.solarwinds123.ru
-      secretName: api-solarwinds123-ru-tls
+      secretName: grafana-tls
