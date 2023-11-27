@@ -8,7 +8,7 @@ class BasicRole:
 
     days_to_check: int = 30
     video_limit_count: int = 5
-    videos_per_day: int = 1
+    videos_per_day: int = 3
 
     def __str__(self) -> str:
         return "basic"

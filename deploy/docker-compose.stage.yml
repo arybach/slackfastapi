@@ -10,7 +10,9 @@ services:
     env_file:
     - .env
     environment:
-      SLACK_FASTAPI_HOST: 0.0.0.0
-      SLACK_FASTAPI_PORT: 8000
+      - SLACK_FASTAPI_HOST=0.0.0.0
+      - SLACK_FASTAPI_PORT=8000
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
     ports:
     - "8000:8000"

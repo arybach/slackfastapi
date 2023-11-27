@@ -13,13 +13,15 @@ services:
       db:
         condition: service_healthy
     environment:
-      SLACK_FASTAPI_HOST: 0.0.0.0
-      SLACK_FASTAPI_PORT: 8000
-      SLACK_FASTAPI_DB_HOST: slack_fastapi-db
-      SLACK_FASTAPI_DB_PORT: 5432
-      SLACK_FASTAPI_DB_USER: slack_fastapi
-      SLACK_FASTAPI_DB_PASS: slack_fastapi
-      SLACK_FASTAPI_DB_BASE: slack_fastapi
+      - SLACK_FASTAPI_HOST=0.0.0.0
+      - SLACK_FASTAPI_PORT=8000
+      - SLACK_FASTAPI_DB_HOST=slack_fastapi-db
+      - SLACK_FASTAPI_DB_PORT=5432
+      - SLACK_FASTAPI_DB_USER=slack_fastapi
+      - SLACK_FASTAPI_DB_PASS=slack_fastapi
+      - SLACK_FASTAPI_DB_BASE=slack_fastapi
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
     ports:
     - "8000:8000"
 
@@ -46,11 +48,13 @@ services:
     restart: "no"
     command: alembic upgrade head
     environment:
-      SLACK_FASTAPI_DB_HOST: slack_fastapi-db
-      SLACK_FASTAPI_DB_PORT: 5432
-      SLACK_FASTAPI_DB_USER: slack_fastapi
-      SLACK_FASTAPI_DB_PASS: slack_fastapi
-      SLACK_FASTAPI_DB_BASE: slack_fastapi
+      - SLACK_FASTAPI_DB_HOST=slack_fastapi-db
+      - SLACK_FASTAPI_DB_PORT=5432
+      - SLACK_FASTAPI_DB_USER=slack_fastapi
+      - SLACK_FASTAPI_DB_PASS=slack_fastapi
+      - SLACK_FASTAPI_DB_BASE=slack_fastapi
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
     depends_on:
       db:
         condition: service_healthy

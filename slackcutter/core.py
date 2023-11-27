@@ -24,7 +24,7 @@ class SlackCutter:
         output_name: str = "output.mp4",
         max_seconds_length: int = 150,
         model_threshold: float = 0.2,
-        sound_check: bool = True,
+        sound_check: bool = False,
         noice_threshold: list = [10, 90],
         audio_threshold: list = [25, 75],
         median_hit_modificator: float = 1.5,
