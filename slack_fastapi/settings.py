@@ -124,10 +124,10 @@ class Settings(BaseSettings):
         )
 
     # S3 Bucket settings
-    s3_region: str = "us-east-1"
-    s3_bucket: str = "slackcutter-backend-dev"
+    s3_region: str = "ap-southeast-1"
+    s3_bucket: str = "slackfastapi-backend"
     s3_prefix: str = "/prefix"
-    s3_endpoint_url: str = "https://slackcutter-backend-dev.s3.amazonaws.com"
+    s3_endpoint_url: str = "https://slackfastapi-backend.s3.amazonaws.com"
     s3_access_key: str = os.getenv("AWS_ACCESS_KEY_ID", "default_access_key")
     s3_secret_key: str = os.getenv("AWS_SECRET_ACCESS_KEY", "default_secret_key")
 
