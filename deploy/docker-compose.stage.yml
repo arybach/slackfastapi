@@ -5,11 +5,16 @@ services:
     build:
       context: .
       dockerfile: ./deploy/Dockerfile
+      args:
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
     restart: always
     env_file:
     - .env
     environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SLACK_FASTAPI_HOST: 0.0.0.0
       SLACK_FASTAPI_PORT: 8000
     ports:

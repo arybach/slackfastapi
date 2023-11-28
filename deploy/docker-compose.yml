@@ -5,6 +5,9 @@ services:
     build:
       context: .
       dockerfile: ./deploy/Dockerfile
+      args:
+          AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+          AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
     image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
     restart: always
     env_file:
@@ -13,6 +16,8 @@ services:
       db:
         condition: service_healthy
     environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SLACK_FASTAPI_HOST: 0.0.0.0
       SLACK_FASTAPI_PORT: 8000
       SLACK_FASTAPI_DB_HOST: slack_fastapi-db
@@ -46,6 +51,8 @@ services:
     restart: "no"
     command: alembic upgrade head
     environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SLACK_FASTAPI_DB_HOST: slack_fastapi-db
       SLACK_FASTAPI_DB_PORT: 5432
       SLACK_FASTAPI_DB_USER: slack_fastapi
