@@ -1,4 +1,7 @@
 # FastAPI backend for SlackCutter APP
+
+## Important: export AWS_SECRET_ACCESS_KEY and AWS_ACCESS_KEY_ID or define them in .emv file
+
 ## Table of contents
 1. **[Project structure](#project-structure)**
 2. **[Poetry](#poetry)**
@@ -222,9 +225,38 @@ pytest -vv .
 
 1. Visit **Swagger** page by default on [`127.0.0.1:8000/api/docs`](http://127.0.0.1:8000/api/docs)
 2. Register user account by `[POST] /api/auth/register`
+```
+curl -X POST http://127.0.0.1:8000/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{"email": "mats.tumblebuns@gmail.com"}'
+```
 3. Confirm email by `[POST] /api/auth/confirm` default code is **1234**
-4. Copy `access_token` and `refresh_token` from response of 3.
+```
+curl -X POST http://127.0.0.1:8000/api/auth/email/confirm \
+     -H "Content-Type: application/json" \
+     -d '{"email": "mats.tumblebuns@gmail.com", "code": "1234"}'
+```
+4. Create new user credentials
+
+```
+curl -X POST http://127.0.0.1:8000/api/auth/setup \
+     -H "Content-Type: application/json" \
+     -d '{\
+               "email": "mats.tumblebuns@gmail.com",\
+               "password": "tumblebuns",\
+               "first_name": "Mats",\
+               "last_name": "Tumblebuns"\
+         }'
+# this returns access_token, like:
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA'
+```
+
 5. Paste `access_token` into **Authorization** field in the top-right of **Swagger** page
+```
+curl -X GET http://127.0.0.1:8000/api/user/settings \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA"
+```
+
 6. Enter user setting by `[PUT] /api/user/settings`. You can see the list of current ML models by `[GET] /api/user/models`.
 Default settings is:
    * Max seconds length: 10
@@ -239,89 +271,44 @@ Default settings is:
    * Crop interval: 1.5
    * Sound check: True
    * Trained model: RanFor_Action Sports.joblib
+
 7. Upload the source video by `[POST] /api/video`
+
+```
+curl -X 'POST' \\n  'http://127.0.0.1:8000/api/video' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'video_file=@Big Wave Carnage at Red Bull Cape Fear 2016 - Action Highlights.mp4;type=video/mp4' \
+  -F 'audio_file='
+```
+
 8. Copy video `id` from response of 7.
 9. Create clip by `[POST] /api/clip`
+```
+curl -X 'POST' \\n  'http://127.0.0.1:8000/api/clip' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -d '{"id": 1, "output_name": "redbull_clip"}'\n
+```
+
 10. Download final clip by `[POST] /api/clip/download`
 
-### Deployment instructions
 ```
-git clone http://github.com/arybach/slackfastapi
-cd slackfastapi/terraform
-terraform init
-terraform apply -var-file=terraform.tfvars -auto-approve
-terraform output -json > ../ansible/terraform_outputs.json
-cd ../ansible
-ansible-playbook fetch-creds.yml
+curl -X 'POST' \\n  'http://127.0.0.1:8000/api/clip/download' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -d '{"id": 1}' \\n  --output ~/Downloads/redbull_clip.mp4
 ```
-### update DNS records in yandex CLI
-![Alt text](image.png)
+
+11. Delete video by `[DELETE] /api/video/{id}`
 
 ```
-cd ../slackfastapi-master
-kubectl create namespace slack-fastapi
-kubectl apply -f deploy/kube
-```
-### create managed Gitlab instance via yandex UI
-![Alt text](image-1.png)
-![Alt text](image-2.png)
-
-### login using reset link sent to the email provided at Gitlab instance creation
-### then create group
-![Alt text](image-3.png)
-
-### Under Settings -> CI/CD -> expand variables and add docker hub credentials:
-```
-CI_REGISTRY_USER
-CI_REGISTRY_PASSWORD
-```
-### Create new project for the group (ADD ssh key via Gitlab UI)
-![Alt text](image-4.png)
-
-### then push slackfastapi-master to gitlab
-```
-cd /media/groot/projects/slackfastapi/slackfastapi-master
-git init --initial-branch=main # if needed
-git remote set-url origin https://redevops.gitlab.yandexcloud.net/slackfastapi/slackfastapi.git
-# check
-git remote -v
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/tumblebuns
-# change remote url to use ssh:
-git remote set-url origin git@redevops.gitlab.yandexcloud.net:slackfastapi/slackfastapi.git
-git push -u origin main
-```
-### under project Settings -> CI/CD -> Runners -> New Runner
-![Alt text](image-5.png)
-
-### then follow instaructions to register runner:
-```
-# for a dedicated VM setup:
-gitlab-runner register  --url https://redevops.gitlab.yandexcloud.net  --token glrt-XeMFndRZNebqCpt8Xift
-
-# for kubernetes setup:
-cd ../ansible
-export GITLAB_RUNNER_TOKEN=GR1348941ux54obusFXvjWk9M9RsH
-ansible-playbook deploy-runner.yml
-```
-![Alt text](image-6.png)
-### under project -> Settings -> CI/CD -> Runners click on the newly registered runner to edit:
-### add tags: docker-runner, kubernetes-runner, deploy-runner
-
-### under project -> Settings -> CI/CD -> Variables add:
-```
-# General FastAPI settings
-SLACK_FASTAPI_RELOAD="True"
-SLACK_FASTAPI_PORT="8000"
-SLACK_FASTAPI_ENVIRONMENT="dev"
-
-# Database settings (modify with your database credentials)
-SLACK_FASTAPI_DB_HOST="slack_fastapi-db"  # Use the service name of the database in docker-compose.yml
-SLACK_FASTAPI_DB_PORT="5432"              # Same as in docker-compose.yml
-SLACK_FASTAPI_DB_USER="slack_fastapi"     # Same as POSTGRES_USER in docker-compose.yml
-SLACK_FASTAPI_DB_PASSWORD="slack_fastapi" # Same as POSTGRES_PASSWORD in docker-compose.yml
-SLACK_FASTAPI_DB_NAME="slack_fastapi"     # Same as POSTGRES_DB in docker-compose.yml
-
-# Additional settings (if any) based on your application's `settings.py`, for example:
-# SLACK_FASTAPI_API_KEY="your_api_key_value"
+curl -X 'DELETE' \\n  'http://127.0.0.1:8000/api/clip' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -d '{"id": 1}'\n
 ```

@@ -153,8 +153,6 @@ class VideoHandler:
                 "s3",
                 region_name=settings.s3_region,
                 endpoint_url=settings.s3_endpoint_url,
-                aws_access_key_id=settings.s3_access_key,
-                aws_secret_access_key=settings.s3_secret_key,
             ) as resource:
                 s3_bucket = await resource.Bucket(settings.s3_bucket)
                 await s3_bucket.put_object(
@@ -189,8 +187,6 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
         ) as resource:
             s3_bucket = await resource.Bucket(settings.s3_bucket)
 
@@ -328,8 +324,6 @@ class VideoHandler:
                 "s3",
                 region_name=settings.s3_region,
                 endpoint_url=settings.s3_endpoint_url,
-                aws_access_key_id=settings.s3_access_key,
-                aws_secret_access_key=settings.s3_secret_key,
             ) as resource:
                 obj = await VideoHandler.s3_object_by_key(
                     key=video_model.audio_key,
@@ -360,8 +354,6 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
         ) as resource:
             obj = await VideoHandler.s3_object_by_key(
                 key=key,
@@ -458,13 +450,12 @@ class VideoHandler:
         :return: Media key
         """
         user_folder = Generics.string2md5(user_email)
+        prefix = settings.s3_prefix if settings.s3_prefix else ""
 
-        if is_clip:
-            prefix = Path(settings.s3_prefix).joinpath(user_folder).joinpath("clips")
-        else:
-            prefix = Path(settings.s3_prefix).joinpath(user_folder)
+        # Determine the type of content (clip or not)
+        content_type = "clips" if is_clip else "content"
 
-        return prefix.joinpath(md5name).as_posix()
+        return f"{user_folder}/{prefix}/{md5name}/{content_type}"
 
     @staticmethod
     async def generate_md5_filename(file: bytes, filename: str) -> str:
@@ -712,8 +703,6 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
         ) as resource:
             objects = []
 
