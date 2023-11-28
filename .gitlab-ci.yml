@@ -5,16 +5,14 @@ stages:
 - "staging"
 - "deploy"
 
-# Build template definition
 .build-template: &build_definition
   stage: build
   image:
     name: gcr.io/kaniko-project/executor:v1.14.0-debug
     entrypoint: [""]
   script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --verbosity=debug
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --verbosity=debug
   tags:
     - kubernetes-runner
 
@@ -106,7 +104,7 @@ stage-clean:
   extends:
   - .kube-context
   script:
-    - kubectl delete namespace slack_fastapi --ignore-not-found
+    - kubectl delete namespace slack-fastapi --ignore-not-found
   environment:
     name: staging
   when: manual
@@ -118,7 +116,7 @@ clean:
   extends:
   - .kube-context
   script:
-    - kubectl delete namespace slack_fastapi --ignore-not-found
+    - kubectl delete namespace slack-fastapi --ignore-not-found
   environment:
     name: production
   when: manual

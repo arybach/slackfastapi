@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException, status
 from fastapi.param_functions import Depends
+from fastapi.security import OAuth2PasswordRequestForm
 
 from slack_fastapi.db.dao.tokens_dao import TokenDAO
 from slack_fastapi.db.dao.users_dao import UserDAO
@@ -255,3 +256,28 @@ async def refresh_tokens(
     :return: TokenSchema
     """
     return token_handler.get_tokens(identity=requires_token)
+
+
+@router.post("/reissue", response_model=TokenSchema)
+async def reissue_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    user_dao: UserDAO = Depends(),
+) -> TokenSchema:
+    """
+    Reissue token endpoint.
+
+    Validates user credentials and provides new JWT tokens.
+
+    :param form_data: OAuth2PasswordRequestForm containing the user credentials.
+    :param user_dao: DAO of user model.
+    :return: JWT Tokens if valid credentials.
+    :raises HTTPException: If the username or password is incorrect.
+    """
+    user = await user_dao.get_user(email=form_data.username)
+    if not user or not auth_handler.verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token_handler.get_tokens(identity=user.email)
