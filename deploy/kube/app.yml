@@ -47,6 +47,7 @@ metadata:
   namespace: slack-fastapi
   name: slack-fastapi-app-service
 spec:
+  type: NodePort
   selector:
     app: slack-fastapi-app
   ports:
@@ -60,7 +61,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: slack-fastapi-app
-  namespace: slack-fastapi
+  namespace: traefik
   labels:
     name: slack-fastapi-app
   annotations:
@@ -69,7 +70,6 @@ metadata:
     cert-manager.io/cluster-issuer: "letsencrypt-issuer"
 spec:
   rules:
-  # - host: slack-fastapi.local
     - host: api.solarwinds123.ru
       http:
         paths:
