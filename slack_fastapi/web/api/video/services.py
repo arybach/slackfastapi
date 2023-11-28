@@ -153,8 +153,7 @@ class VideoHandler:
                 "s3",
                 region_name=settings.s3_region,
                 endpoint_url=settings.s3_endpoint_url,
-                aws_access_key_id=settings.s3_access_key,
-                aws_secret_access_key=settings.s3_secret_key,
+                # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY will be automatically used from environment variables
             ) as resource:
                 s3_bucket = await resource.Bucket(settings.s3_bucket)
                 await s3_bucket.put_object(
@@ -189,8 +188,7 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
+            # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY will be automatically used from environment variables
         ) as resource:
             s3_bucket = await resource.Bucket(settings.s3_bucket)
 
@@ -328,8 +326,7 @@ class VideoHandler:
                 "s3",
                 region_name=settings.s3_region,
                 endpoint_url=settings.s3_endpoint_url,
-                aws_access_key_id=settings.s3_access_key,
-                aws_secret_access_key=settings.s3_secret_key,
+                # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY will be automatically used from environment variables
             ) as resource:
                 obj = await VideoHandler.s3_object_by_key(
                     key=video_model.audio_key,
@@ -360,8 +357,7 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
+            # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY will be automatically used from environment variables
         ) as resource:
             obj = await VideoHandler.s3_object_by_key(
                 key=key,
@@ -452,19 +448,19 @@ class VideoHandler:
         """
         Generate media key.
 
-        :param user_email: User's id
+        :param user_email: User's email
         :param md5name: md5name (out of bytes) of media file
         :param is_clip: Do key belongs to the clip?
         :return: Media key
         """
         user_folder = Generics.string2md5(user_email)
+        prefix = settings.s3_prefix if settings.s3_prefix else ""
 
-        if is_clip:
-            prefix = Path(settings.s3_prefix).joinpath(user_folder).joinpath("clips")
-        else:
-            prefix = Path(settings.s3_prefix).joinpath(user_folder)
+        # Determine the type of content (clip or not)
+        content_type = "clips" if is_clip else "content"
 
-        return prefix.joinpath(md5name).as_posix()
+        # Construct the key with the desired format
+        return f"{user_folder}/{md5name}/{prefix}/{content_type}"
 
     @staticmethod
     async def generate_md5_filename(file: bytes, filename: str) -> str:
@@ -712,8 +708,7 @@ class VideoHandler:
             "s3",
             region_name=settings.s3_region,
             endpoint_url=settings.s3_endpoint_url,
-            aws_access_key_id=settings.s3_access_key,
-            aws_secret_access_key=settings.s3_secret_key,
+            # AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY will be automatically used from environment variables
         ) as resource:
             objects = []
 
