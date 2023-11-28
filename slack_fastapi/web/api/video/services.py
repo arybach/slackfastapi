@@ -178,8 +178,8 @@ class VideoHandler:
         first return bool value relates to the success of video upload;
         second return bool value relates to the success of audio upload
 
-        :param video_dict: Dictionary that contains atleast 3 essencial keys
-        :param audio_dict: Dictionary that contains atleast 3 essencial keys
+        :param video_dict: Dictionary that contains atleast 3 essential keys
+        :param audio_dict: Dictionary that contains atleast 3 essential keys
         :return: (bool, bool), each boolean corresponding media upload success;
         """
         tasks = []

@@ -7,8 +7,8 @@ class BasicRole:
     """Basic role. Limited video upload capabilities."""
 
     days_to_check: int = 30
-    video_limit_count: int = 5
-    videos_per_day: int = 3
+    video_limit_count: int = 10
+    videos_per_day: int = 5
 
     def __str__(self) -> str:
         return "basic"
