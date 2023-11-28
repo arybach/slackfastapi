@@ -303,7 +303,17 @@ curl -X 'POST' \\n  'http://127.0.0.1:8000/api/clip/download' \
   -d '{"id": 1}' \\n  --output ~/Downloads/redbull_clip.mp4
 ```
 
-11. Delete video by `[DELETE] /api/video/{id}`
+11. Reissue token if expired by `[POST] /api/auth/reissue`
+
+```
+curl -X 'POST' \
+  'http://127.0.0.1:8000/api/auth/reissue' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=&username=mats.tumblebuns%40gmail.com&password=tumblebuns&scope=&client_id=&client_secret='
+```
+
+12. Delete video by `[DELETE] /api/video/{id}`
 
 ```
 curl -X 'DELETE' \\n  'http://127.0.0.1:8000/api/clip' \
