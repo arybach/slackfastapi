@@ -18,7 +18,7 @@ spec:
       - name: registrykey
       containers:
       - name: app
-        #image: slack_fastapi:latest
+        #image: redevops.gitlab.yandexcloud.net:5050/slackfastapi/slackfastapi:main
         image: "{{ app_image }}"
         readinessProbe:
           httpGet:
@@ -35,7 +35,7 @@ spec:
           value: "slack-fastapi-db-service"
         resources:
           limits:
-            cpu: "300m"
+            cpu: "500m"
             memory: "900Mi"  # Increased from 200Mi to 500Mi
         ports:
         - containerPort: 8000
@@ -73,7 +73,7 @@ metadata:
     cert-manager.io/cluster-issuer: "yc-clusterissuer"
 spec:
   rules:
-    - host: api.solarwinds123.ru
+    - host: api.redevops.io
       http:
         paths:
           - pathType: Prefix
@@ -86,6 +86,6 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - api.solarwinds123.ru
-      secretName: api-solarwinds123-ru-tls
+        - api.redevops.io
+      secretName: api-redevops-io-tls
 ---

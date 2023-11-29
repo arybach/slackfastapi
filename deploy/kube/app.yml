@@ -18,7 +18,7 @@ spec:
       - name: registrykey
       containers:
       - name: app
-        image: redevops.io.ru:5050/slackfastapi/slackfastapi:main
+        image: redevops.gitlab.yandexcloud.net:5050/slackfastapi/slackfastapi:main
         #image: __APP_IMAGE__
         readinessProbe:
           httpGet:
@@ -73,7 +73,7 @@ metadata:
     cert-manager.io/cluster-issuer: "yc-clusterissuer"
 spec:
   rules:
-    - host: api.redevops.io.ru
+    - host: api.redevops.io
       http:
         paths:
           - pathType: Prefix
@@ -85,6 +85,6 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - api.redevops.io.ru
-      secretName: api-redevops.io-ru-tls
+        - api.redevops.io
+      secretName: api-redevops-io-tls
 ---

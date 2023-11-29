@@ -55,7 +55,7 @@ spec:
       - name: registrykey
       containers:
       - name: migrator
-        image: solarwinds123.ru:5050/slackfastapi/slackfastapi:main
+        image: redevops.gitlab.yandexcloud.net:5050/slackfastapi/slackfastapi:main
         #image: __APP_IMAGE__
         command:
         - "alembic"
