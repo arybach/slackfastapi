@@ -67,7 +67,10 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+    # for DO
+    # cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+    # for YC
+    cert-manager.io/cluster-issuer: "yc-clusterissuer"
 spec:
   rules:
     - host: api.solarwinds123.ru

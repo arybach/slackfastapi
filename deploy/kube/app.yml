@@ -18,7 +18,7 @@ spec:
       - name: registrykey
       containers:
       - name: app
-        image: solarwinds123.ru:5050/slackfastapi/slackfastapi:main
+        image: redevops.io.ru:5050/slackfastapi/slackfastapi:main
         #image: __APP_IMAGE__
         readinessProbe:
           httpGet:
@@ -67,10 +67,13 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+    # for DO
+    # cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+    # for YC
+    cert-manager.io/cluster-issuer: "yc-clusterissuer"
 spec:
   rules:
-    - host: api.solarwinds123.ru
+    - host: api.redevops.io.ru
       http:
         paths:
           - pathType: Prefix
@@ -82,6 +85,6 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - api.solarwinds123.ru
-      secretName: api-solarwinds123-ru-tls
+        - api.redevops.io.ru
+      secretName: api-redevops.io-ru-tls
 ---
