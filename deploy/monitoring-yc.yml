@@ -207,3 +207,35 @@ spec:
     - hosts:
         - grafana.redevops.io
       secretName: grafana-tls
+---
+# to re-apply it since traefik was not running at the time it was applied the first time
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: slack-fastapi-app
+  namespace: slack-fastapi
+  labels:
+    name: slack-fastapi-app
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    # for DO
+    # cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+    # for YC
+    cert-manager.io/cluster-issuer: "yc-clusterissuer"
+spec:
+  rules:
+    - host: api.redevops.io
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: slack-fastapi-app-service
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - api.redevops.io
+      secretName: api-redevops-io-tls
