@@ -16,7 +16,7 @@ spec:
       - slack-fastapi
   endpoints:
     - port: "8000"
-      interval: 30s
+      interval: 60s
       path: "/metrics"
 
 ---
@@ -59,7 +59,7 @@ spec:
       - slack-fastapi
   endpoints:
   - port: "9187"
-    interval: 30s
+    interval: 60s
 
 ---
 # Deployment for RabbitMQ Exporter
@@ -104,7 +104,7 @@ spec:
       - slack-fastapi
   endpoints:
   - port: "9419"
-    interval: 30s
+    interval: 60s
 
 ---
 # Service definition for Grafana (NodePort type)
