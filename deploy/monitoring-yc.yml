@@ -149,35 +149,35 @@ spec:
     port: 8080
     targetPort: reloader-web
 
----
-# Ingress for Prometheus
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: prometheus
-  namespace: prometheus
-  labels:
-    name: prometheus
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: "yc-clusterissuer"
-spec:
-  rules:
-    - host: prometheus.redevops.io
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: kube-prom-stack-kube-prome-prometheus
-                port:
-                  number: 9090
-  tls:
-    - hosts:
-        - prometheus.redevops.io
-      secretName: prometheus-tls
+# ---
+# # Ingress for Prometheus
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: prometheus
+#   namespace: prometheus
+#   labels:
+#     name: prometheus
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#     traefik.ingress.kubernetes.io/router.tls: "true"
+#     cert-manager.io/cluster-issuer: "yc-clusterissuer"
+# spec:
+#   rules:
+#     - host: prometheus.redevops.io
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: kube-prom-stack-kube-prome-prometheus
+#                 port:
+#                   number: 9090
+#   tls:
+#     - hosts:
+#         - prometheus.redevops.io
+#       secretName: prometheus-tls
 ---
 # Ingress for Grafana
 apiVersion: networking.k8s.io/v1
@@ -239,3 +239,32 @@ spec:
     - hosts:
         - api.redevops.io
       secretName: api-redevops-io-tls
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: loki-gateway
+#   namespace: prometheus
+#   labels:
+#     name: loki-gateway
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#     traefik.ingress.kubernetes.io/router.tls: "true"
+#     cert-manager.io/cluster-issuer: "yc-clusterissuer"
+# spec:
+#   rules:
+#     - host: loki.redevops.io
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: loki-gateway
+#                 port:
+#                   number: 80
+#   tls:
+#     - hosts:
+#         - loki.redevops.io
+#       secretName: loki-tls
