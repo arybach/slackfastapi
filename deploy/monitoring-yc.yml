@@ -106,25 +106,25 @@ spec:
   - port: "9419"
     interval: 60s
 
----
-# Service definition for Grafana (NodePort type)
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: prometheus
-  name: kube-prom-stack-grafana
-  labels:
-    app.kubernetes.io/instance: kube-prom-stack
-    app.kubernetes.io/name: grafana
-spec:
-  type: NodePort
-  selector:
-    app.kubernetes.io/instance: kube-prom-stack
-    app.kubernetes.io/name: grafana
-  ports:
-  - name: http-web
-    port: 80
-    targetPort: 3000
+# ---
+# # Service definition for Grafana (NodePort type)
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   namespace: prometheus
+#   name: kube-prom-stack-grafana
+#   labels:
+#     app.kubernetes.io/instance: kube-prom-stack
+#     app.kubernetes.io/name: grafana
+# spec:
+#   type: NodePort
+#   selector:
+#     app.kubernetes.io/instance: kube-prom-stack
+#     app.kubernetes.io/name: grafana
+#   ports:
+#   - name: http-web
+#     port: 80
+#     targetPort: 3000
 
 ---
 # Service definition for Prometheus (NodePort type)
@@ -200,7 +200,7 @@ spec:
             path: "/"
             backend:
               service:
-                name: kube-prom-stack-grafana
+                name: grafana
                 port:
                   number: 80
   tls:
@@ -244,10 +244,10 @@ spec:
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
 # metadata:
-#   name: loki-gateway
+#   name: loki
 #   namespace: prometheus
 #   labels:
-#     name: loki-gateway
+#     name: loki
 #   annotations:
 #     traefik.ingress.kubernetes.io/router.entrypoints: websecure
 #     traefik.ingress.kubernetes.io/router.tls: "true"
@@ -261,9 +261,9 @@ spec:
 #             path: "/"
 #             backend:
 #               service:
-#                 name: loki-gateway
+#                 name: loki
 #                 port:
-#                   number: 80
+#                   number: 3100
 #   tls:
 #     - hosts:
 #         - loki.redevops.io
