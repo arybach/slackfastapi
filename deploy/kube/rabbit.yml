@@ -53,9 +53,11 @@ spec:
   selector:
     app: "slack-fastapi-rmq"
   ports:
-  - port: 5672
+  - name: amqp
+    port: 5672
     targetPort: amqp
-  - port: 15672
+  - name: management
+    port: 15672
     targetPort: management
 
 # RabbitMQ Exporter Deployment
