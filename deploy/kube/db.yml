@@ -1,3 +1,4 @@
+# PostgreSQL Database Deployment
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -29,6 +30,8 @@ spec:
           value: "slack_fastapi"
         ports:
         - containerPort: 5432
+
+# PostgreSQL Service
 ---
 apiVersion: v1
 kind: Service
@@ -41,6 +44,8 @@ spec:
   ports:
   - port: 5432
     targetPort: 5432
+
+# Database Migration Job
 ---
 apiVersion: batch/v1
 kind: Job
@@ -56,7 +61,6 @@ spec:
       containers:
       - name: migrator
         image: redevops.gitlab.yandexcloud.net:5050/slackfastapi/slackfastapi:main
-        #image: __APP_IMAGE__
         command:
         - "alembic"
         - "upgrade"
@@ -74,4 +78,46 @@ spec:
         command: ["./wait-for-it.sh", "-t", "60", "slack-fastapi-db-service:5432"]
       restartPolicy: Never
 
+# PostgreSQL Exporter Deployment
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-exporter
+  namespace: slack-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  template:
+    metadata:
+      labels:
+        app: postgres-exporter
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: wrouesnel/postgres_exporter
+        env:
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://slack-fastapi:slack-fastapi@slack-fastapi-db-service:5432/?sslmode=disable"
+        ports:
+        - containerPort: 9187  # Ensure this port is open for Prometheus scraping
+
+# ServiceMonitor for Postgres Exporter
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postgres-exporter
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: postgres-exporter
+  namespaceSelector:
+    matchNames:
+      - slack-fastapi
+  endpoints:
+  - port: "9187"  # Port on which the exporter is exposing metrics
+    interval: 60s

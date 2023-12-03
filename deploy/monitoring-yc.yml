@@ -25,9 +25,9 @@ metadata:
     team: frontend
 spec:
   selector:
-    matchLabels: {}
-    # matchLabels:
-    #   app: slack-fastapi-app
+    # matchLabels: {}
+    matchLabels:
+      app: slack-fastapi-app
   namespaceSelector:
     matchNames:
       - slack-fastapi
@@ -35,29 +35,6 @@ spec:
     - port: "8000"
       interval: 60s
       path: "/metrics"
----
-# Deployment for Postgres Exporter
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: postgres-exporter
-  namespace: slack-fastapi
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: postgres-exporter
-  template:
-    metadata:
-      labels:
-        app: postgres-exporter
-    spec:
-      containers:
-      - name: postgres-exporter
-        image: wrouesnel/postgres_exporter
-        env:
-        - name: DATA_SOURCE_NAME
-          value: postgresql://slack-fastapi:slack-fastapi@slack-fastapi-db-service:5432/?sslmode=disable
 
 ---
 # ServiceMonitor for Postgres Exporter
@@ -78,34 +55,6 @@ spec:
     interval: 60s
 
 ---
-# Deployment for RabbitMQ Exporter
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: rabbitmq-exporter
-  namespace: slack-fastapi
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: rabbitmq-exporter
-  template:
-    metadata:
-      labels:
-        app: rabbitmq-exporter
-    spec:
-      containers:
-      - name: rabbitmq-exporter
-        image: kbudde/rabbitmq-exporter
-        env:
-        - name: RABBIT_URL
-          value: "http://slack-fastapi-rmq-service:15672"
-        - name: RABBIT_USER
-          value: "guest"
-        - name: RABBIT_PASSWORD
-          value: "guest"
----
-# ServiceMonitor for RabbitMQ Exporter
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:

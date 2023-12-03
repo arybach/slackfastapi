@@ -1,3 +1,4 @@
+# RabbitMQ Deployment
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -36,6 +37,8 @@ spec:
         ports:
         - containerPort: 5672
           name: amqp
+
+# RabbitMQ Service
 ---
 apiVersion: v1
 kind: Service
@@ -49,4 +52,32 @@ spec:
   - port: 5672
     targetPort: amqp
 
+# RabbitMQ Exporter Deployment
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq-exporter
+  namespace: slack-fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq-exporter
+  template:
+    metadata:
+      labels:
+        app: rabbitmq-exporter
+    spec:
+      containers:
+      - name: rabbitmq-exporter
+        image: kbudde/rabbitmq-exporter
+        ports:
+        - containerPort: 9419
+        env:
+        - name: RABBITMQ_URL
+          value: "http://slack-fastapi-rmq-service:15672" # Change if Management Plugin Port is different
+        - name: RABBITMQ_USER
+          value: "guest"
+        - name: RABBITMQ_PASSWORD
+          value: "guest"
