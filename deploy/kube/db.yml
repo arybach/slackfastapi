@@ -104,20 +104,4 @@ spec:
         ports:
         - containerPort: 9187  # Ensure this port is open for Prometheus scraping
 
-# ServiceMonitor for Postgres Exporter
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: postgres-exporter
-  namespace: prometheus
-spec:
-  selector:
-    matchLabels:
-      app: postgres-exporter
-  namespaceSelector:
-    matchNames:
-      - slack-fastapi
-  endpoints:
-  - port: "9187"  # Port on which the exporter is exposing metrics
-    interval: 60s

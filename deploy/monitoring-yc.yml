@@ -15,6 +15,24 @@ spec:
       operator.prometheus.io/name: kube-prom-stack-kube-prome-prometheus
 
 ---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: traefik-monitor
+  namespace: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: traefik-ingress
+  namespaceSelector:
+    matchNames:
+      - traefik  # Namespace where Traefik is deployed
+  endpoints:
+  - port: "web"
+    interval: 60s
+    path: "/metrics"
+
+---
 # ServiceMonitor for FastAPI
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
