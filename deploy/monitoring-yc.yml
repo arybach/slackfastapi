@@ -1,3 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: prometheus-monitor
+  namespace: prometheus
+spec:
+  serviceMonitorSelector:
+    matchLabels:
+      monitor: "true"
+  serviceMonitorNamespaceSelector: {}  # This selector is empty to select ServiceMonitors from all namespaces
+  version: v2.44.0
+  replicas: 1
+
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -5,6 +18,7 @@ metadata:
   name: prometheus-self
   labels:
     app: kube-prom-stack-prometheus
+    monitor: "true"
 spec:
   endpoints:
   - interval: 30s
@@ -15,35 +29,17 @@ spec:
       operator.prometheus.io/name: kube-prom-stack-kube-prome-prometheus
 
 ---
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
-  name: traefik-monitor
-  namespace: prometheus
-spec:
-  selector:
-    matchLabels:
-      app: traefik-ingress
-  namespaceSelector:
-    matchNames:
-      - traefik  # Namespace where Traefik is deployed
-  endpoints:
-  - port: "web"
-    interval: 60s
-    path: "/metrics"
-
----
 # ServiceMonitor for FastAPI
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: fastapi-monitor
-  namespace: prometheus
   labels:
     team: frontend
+    monitor: "true"
+  namespace: prometheus
 spec:
   selector:
-    # matchLabels: {}
     matchLabels:
       app: slack-fastapi-app
   namespaceSelector:
@@ -60,6 +56,9 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: postgres-exporter
+  labels:
+    app: postgres-exporter
+    monitor: "true"  # Added common label for Prometheus to discover
   namespace: prometheus
 spec:
   selector:
@@ -71,12 +70,16 @@ spec:
   endpoints:
   - port: "9187"
     interval: 60s
+    path: "/metrics"
 
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: rabbitmq-exporter
+  labels:
+    app: rabbitmq-exporter
+    monitor: "true"  # Added common label for Prometheus to discover
   namespace: prometheus
 spec:
   selector:
@@ -88,36 +91,37 @@ spec:
   endpoints:
   - port: "9419"
     interval: 60s
+    path: "/metrics"
 
----
-# Ingress for Prometheus
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: prometheus
-  namespace: prometheus
-  labels:
-    name: prometheus
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-    traefik.ingress.kubernetes.io/router.tls: "true"
-    cert-manager.io/cluster-issuer: "yc-clusterissuer"
-spec:
-  rules:
-    - host: prometheus.redevops.io
-      http:
-        paths:
-          - pathType: Prefix
-            path: "/"
-            backend:
-              service:
-                name: kube-prom-stack-kube-prome-prometheus
-                port:
-                  number: 9090
-  tls:
-    - hosts:
-        - prometheus.redevops.io
-      secretName: prometheus-tls
+# ---
+# # Ingress for Prometheus
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: prometheus
+#   namespace: prometheus
+#   labels:
+#     name: prometheus
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#     traefik.ingress.kubernetes.io/router.tls: "true"
+#     cert-manager.io/cluster-issuer: "yc-clusterissuer"
+# spec:
+#   rules:
+#     - host: prometheus.redevops.io
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: kube-prom-stack-kube-prome-prometheus
+#                 port:
+#                   number: 9090
+#   tls:
+#     - hosts:
+#         - prometheus.redevops.io
+#       secretName: prometheus-tls
 
 ---
 # Ingress for Grafana

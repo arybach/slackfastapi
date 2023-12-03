@@ -100,7 +100,7 @@ spec:
         image: wrouesnel/postgres_exporter
         env:
         - name: DATA_SOURCE_NAME
-          value: "postgresql://slack-fastapi:slack-fastapi@slack-fastapi-db-service:5432/?sslmode=disable"
+          value: "postgresql://slack_fastapi:slack_fastapi@slack-fastapi-db-service:5432/?sslmode=disable"
         ports:
         - containerPort: 9187  # Ensure this port is open for Prometheus scraping
 
