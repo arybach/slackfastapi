@@ -16,10 +16,8 @@ spec:
     spec:
       containers:
       - name: rabbit
-        # command: ["rabbitmq-plugins"]
-        # args: ["enable", "rabbitmq_management"]
         # image: rabbitmq:3.9.16-alpine
-        image: thinkco/rabbitmq:3.8.2
+        image: rabbitmq:3.9.16-management
         startupProbe:
           exec:
             command: ["rabbitmq-diagnostics", "check_running", "-q"]
