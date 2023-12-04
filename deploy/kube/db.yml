@@ -23,9 +23,9 @@ spec:
             cpu: "200m"
         env:
         - name: POSTGRES_PASSWORD
-          value: "slack_fastapi"
+          value: ${SLACK_FASTAPI_DB_PASSWORD}
         - name: POSTGRES_USER
-          value: "slack_fastapi"
+          value: ${SLACK_FASTAPI_DB_USER}
         - name: POSTGRES_DB
           value: "slack_fastapi"
         ports:
@@ -100,7 +100,7 @@ spec:
         image: wrouesnel/postgres_exporter
         env:
         - name: DATA_SOURCE_NAME
-          value: "postgresql://slack_fastapi:slack_fastapi@slack-fastapi-db-service:5432/?sslmode=disable"
+          value: "postgresql://${SLACK_FASTAPI_DB_USER}:${SLACK_FASTAPI_DB_PASSWORD}@slack-fastapi-db-service:5432/?sslmode=disable"
         ports:
         - containerPort: 9187  # Ensure this port is open for Prometheus scraping
 

@@ -8,6 +8,10 @@ services:
       args:
           AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
           AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+          SLACK_FASTAPI_DB_USER: ${SLACK_FASTAPI_DB_USER}
+          SLACK_FASTAPI_DB_PASS: ${SLACK_FASTAPI_DB_PASSWORD}
+          RABBITMQ_USER: ${RABBITMQ_USER}
+          RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     image: slack_fastapi:${SLACK_FASTAPI_VERSION:-latest}
     restart: always
     env_file:
@@ -22,9 +26,11 @@ services:
       SLACK_FASTAPI_PORT: 8000
       SLACK_FASTAPI_DB_HOST: slack_fastapi-db
       SLACK_FASTAPI_DB_PORT: 5432
-      SLACK_FASTAPI_DB_USER: slack_fastapi
-      SLACK_FASTAPI_DB_PASS: slack_fastapi
+      SLACK_FASTAPI_DB_USER: ${SLACK_FASTAPI_DB_USER}
+      SLACK_FASTAPI_DB_PASS: ${SLACK_FASTAPI_DB_PASSWORD}
       SLACK_FASTAPI_DB_BASE: slack_fastapi
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     ports:
     - "8000:8000"
 
@@ -32,14 +38,14 @@ services:
     image: postgres:13.8-bullseye
     hostname: slack_fastapi-db
     environment:
-      POSTGRES_PASSWORD: "slack_fastapi"
-      POSTGRES_USER: "slack_fastapi"
+      POSTGRES_PASSWORD: ${SLACK_FASTAPI_DB_PASSWORD}
+      POSTGRES_USER: ${SLACK_FASTAPI_DB_USER}
       POSTGRES_DB: "slack_fastapi"
     volumes:
     - slack_fastapi-db-data:/var/lib/postgresql/data
     restart: always
     healthcheck:
-      test: pg_isready -U slack_fastapi
+      test: pg_isready -U ${SLACK_FASTAPI_DB_USER}
       interval: 2s
       timeout: 3s
       retries: 40
@@ -55,13 +61,14 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       SLACK_FASTAPI_DB_HOST: slack_fastapi-db
       SLACK_FASTAPI_DB_PORT: 5432
-      SLACK_FASTAPI_DB_USER: slack_fastapi
-      SLACK_FASTAPI_DB_PASS: slack_fastapi
+      SLACK_FASTAPI_DB_USER: ${SLACK_FASTAPI_DB_USER}
+      SLACK_FASTAPI_DB_PASS: ${SLACK_FASTAPI_DB_PASSWORD}
       SLACK_FASTAPI_DB_BASE: slack_fastapi
+      RABBITMQ_USER: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
-
 
 
 volumes:

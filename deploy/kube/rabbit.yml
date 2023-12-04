@@ -19,7 +19,7 @@ spec:
         # command: ["rabbitmq-plugins"]
         # args: ["enable", "rabbitmq_management"]
         # image: rabbitmq:3.9.16-alpine
-        image: mychalvlcek/rabbitmq
+        image: thinkco/rabbitmq:3.8.2
         startupProbe:
           exec:
             command: ["rabbitmq-diagnostics", "check_running", "-q"]
@@ -28,9 +28,9 @@ spec:
           timeoutSeconds: 10
         env:
         - name: RABBITMQ_DEFAULT_USER
-          value: "apiuser"
+          value: ${RABBITMQ_USER}
         - name: RABBITMQ_DEFAULT_PASS
-          value: "apipass"
+          value: ${RABBITMQ_PASSWORD}
         - name: RABBITMQ_DEFAULT_VHOST
           value: "/"
         resources:
@@ -87,6 +87,6 @@ spec:
         - name: RABBITMQ_URL
           value: "http://slack-fastapi-rmq-service:15672" # Change if Management Plugin Port is different
         - name: RABBITMQ_USER
-          value: "apiuser"
+          value: ${RABBITMQ_USER}
         - name: RABBITMQ_PASSWORD
-          value: "apipass"
+          value: ${RABBITMQ_PASSWORD}

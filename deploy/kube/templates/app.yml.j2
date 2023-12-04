@@ -18,8 +18,8 @@ spec:
       - name: registrykey
       containers:
       - name: app
-        #image: redevops.gitlab.yandexcloud.net:5050/slackfastapi/slackfastapi:main
         image: "{{ app_image }}"
+        #image: __APP_IMAGE__
         readinessProbe:
           httpGet:
             path: /api/health
@@ -35,7 +35,7 @@ spec:
           value: "slack-fastapi-db-service"
         resources:
           limits:
-            cpu: "500m"
+            cpu: "300m"
             memory: "900Mi"  # Increased from 200Mi to 500Mi
         ports:
         - containerPort: 8000
@@ -57,35 +57,35 @@ spec:
     name: api-port
 
 ---
-#apiVersion: networking.k8s.io/v1
-#kind: Ingress
-#metadata:
-#  name: slack-fastapi-app
-#  namespace: slack-fastapi
-#  labels:
-#    name: slack-fastapi-app
-#  annotations:
-#    traefik.ingress.kubernetes.io/router.entrypoints: websecure
-#    traefik.ingress.kubernetes.io/router.tls: "true"
-#    # for DO
-#    # cert-manager.io/cluster-issuer: "letsencrypt-issuer"
-#    # for YC
-#    cert-manager.io/cluster-issuer: "yc-clusterissuer"
-#spec:
-#  rules:
-#    - host: api.redevops.io
-#      http:
-#        paths:
-#          - pathType: Prefix
-#            path: "/"
-#            backend:
-#              service:
-#                name: slack-fastapi-app-service
-#                namespace: slack-fastapi  # Specify the service namespace
-#                port:
-#                  number: 80
-#  tls:
-#    - hosts:
-#        - api.redevops.io
-#      secretName: api-redevops-io-tls
-#---
+# this ingress will be applied in monitoring after traefik ingress controller is up and running
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: slack-fastapi-app
+#   namespace: slack-fastapi
+#   labels:
+#     name: slack-fastapi-app
+#   annotations:
+#     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+#     traefik.ingress.kubernetes.io/router.tls: "true"
+#     # for DO
+#     # cert-manager.io/cluster-issuer: "letsencrypt-issuer"
+#     # for YC
+#     cert-manager.io/cluster-issuer: "yc-clusterissuer"
+# spec:
+#   rules:
+#     - host: api.redevops.io
+#       http:
+#         paths:
+#           - pathType: Prefix
+#             path: "/"
+#             backend:
+#               service:
+#                 name: slack-fastapi-app-service
+#                 port:
+#                   number: 80
+#   tls:
+#     - hosts:
+#         - api.redevops.io
+#       secretName: api-redevops-io-tls
+# ---
