@@ -52,7 +52,7 @@ pytest:
   variables:
     # Postgresql variables
     SLACK_FASTAPI_DB_HOST: database
-    POSTGRES_PASS: slack_fastapi
+    POSTGRES_PASSWORD: slack_fastapi
     POSTGRES_USER: slack_fastapi
     POSTGRES_DB: slack_fastapi
   script:

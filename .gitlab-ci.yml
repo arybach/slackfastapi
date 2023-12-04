@@ -79,7 +79,7 @@ pytest:
   variables:
     SLACK_FASTAPI_DB_BASE: "slack_fastapi_test"
     SLACK_FASTAPI_DB_HOST: database
-    POSTGRES_PASS: $SLACK_FASTAPI_DB_PASS
+    POSTGRES_PASSWORD: $SLACK_FASTAPI_DB_PASS
     POSTGRES_USER: $SLACK_FASTAPI_DB_USER
     POSTGRES_DB: slack_fastapi
   before_script:
