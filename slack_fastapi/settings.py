@@ -1,4 +1,5 @@
 import enum
+import os
 from datetime import datetime, timedelta
 from glob import glob
 from pathlib import Path
@@ -123,12 +124,15 @@ class Settings(BaseSettings):
         )
 
     # S3 Bucket settings
-    s3_region: str = "ap-southeast-1"
-    s3_bucket: str = "slackfastapi-backend"
-    s3_prefix: str = "/data"
-    s3_endpoint_url: str = "https://slackfastapi-backend.s3.amazonaws.com"
-    s3_access_key: str = "access_key"
-    s3_secret_key: str = "secret_key"
+    s3_region: str = os.getenv("SLACK_FASTAPI_S3_REGION", "ap-southeast-1")
+    s3_bucket: str = os.getenv("SLACK_FASTAPI_S3_BUCKET", "slackfastapi-backend")
+    s3_prefix: str = os.getenv("SLACK_FASTAPI_S3_PREFIX", "/data")
+    s3_endpoint_url: str = os.getenv(
+        "SLACK_FASTAPI_S3_ENDPOINT_URL",
+        "https://slackfastapi-backend.s3.amazonaws.com",
+    )
+    s3_access_key: str = os.getenv("SLACK_FASTAPI_S3_ACCESS_KEY", "access_key")
+    s3_secret_key: str = os.getenv("SLACK_FASTAPI_S3_SECRET_KEY", "secret_key")
 
     # Temp files settings
     temp_dir: str = "temp/"
@@ -148,12 +152,12 @@ class Settings(BaseSettings):
     ]
 
     # Variables for the database
-    db_host: str = "localhost"
-    db_port: int = 5432
-    db_user: str = "slack_fastapi"
-    db_pass: str = "slack_fastapi"
-    db_base: str = "slack_fastapi"
-    db_echo: bool = False
+    db_host: str = os.getenv("SLACK_FASTAPI_DB_HOST", "localhost")
+    db_port: int = int(os.getenv("SLACK_FASTAPI_DB_PORT", 5432))
+    db_user: str = os.getenv("SLACK_FASTAPI_DB_USER", "slack_fastapi")
+    db_pass: str = os.getenv("SLACK_FASTAPI_DB_PASS", "slack_fastapi")
+    db_base: str = os.getenv("SLACK_FASTAPI_DB_BASE", "slack_fastapi")
+    db_echo: bool = bool(os.getenv("SLACK_FASTAPI_DB_ECHO", 0))
 
     @property
     def db_url(self) -> URL:

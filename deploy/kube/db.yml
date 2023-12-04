@@ -22,11 +22,11 @@ spec:
             memory: "300Mi"
             cpu: "200m"
         env:
-        - name: POSTGRES_PASSWORD
+        - name: POSTGRES_PASS
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_password
+              key: slack_fastapi_db_pass
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -76,6 +76,16 @@ spec:
             memory: "200Mi"
             cpu: "250m"
         env:
+        - name: POSTGRES_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: slack_fastapi_db_pass
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: slack_fastapi_db_user
         - name: "SLACK_FASTAPI_DB_HOST"
           value: "slack-fastapi-db-service"
       initContainers:
@@ -86,6 +96,7 @@ spec:
 
 # PostgreSQL Exporter Deployment
 ---
+# PostgreSQL Exporter Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -105,19 +116,19 @@ spec:
       - name: postgres-exporter
         image: wrouesnel/postgres_exporter
         env:
-        - name: DB_USER
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASS)@slack-fastapi-db-service:5432/?sslmode=disable"
+        - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
               key: slack_fastapi_db_user
-        - name: DB_PASSWORD
+        - name: POSTGRES_PASS
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_password
-        - name: DATA_SOURCE_NAME
-          value: "postgresql://$(DB_USER):$(DB_PASSWORD)@slack-fastapi-db-service:5432/?sslmode=disable"
+              key: slack_fast_db_pass
         ports:
-        - containerPort: 9187  # Ensure this port is open for Prometheus scraping
+        - containerPort: 9187
 
 ---

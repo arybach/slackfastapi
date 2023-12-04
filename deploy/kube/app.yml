@@ -27,6 +27,16 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
         env:
+        - name: SLACK_FASTAPI_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: slack_fastapi_db_user
+        - name: SLACK_FASTAPI_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: slack_fastapi_db_user
         - name: SLACK_FASTAPI_HOST
           value: "0.0.0.0"
         - name: SLACK_FASTAPI_WORKERS_COUNT

@@ -12,7 +12,7 @@ stages:
     entrypoint: [""]
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg RABBITMQ_USER=$RABBITMQ_USER --build-arg RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD --build-arg SLACK_FASTAPI_DB_USER=$SLACK_FASTAPI_DB_USER --build-arg SLACK_FASTAPI_DB_PASSWORD=$SLACK_FASTAPI_DB_PASSWORD --verbosity=debug
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/deploy/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --build-arg AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID --build-arg AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --build-arg RABBITMQ_USER=$RABBITMQ_USER --build-arg RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD --build-arg SLACK_FASTAPI_DB_USER=$SLACK_FASTAPI_DB_USER --build-arg SLACK_FASTAPI_DB_PASS=$SLACK_FASTAPI_DB_PASS --verbosity=debug
   tags:
     - kubernetes-runner
 
@@ -79,8 +79,8 @@ pytest:
   variables:
     SLACK_FASTAPI_DB_BASE: "slack_fastapi_test"
     SLACK_FASTAPI_DB_HOST: database
-    POSTGRES_PASSWORD: slack_fastapi
-    POSTGRES_USER: slack_fastapi
+    POSTGRES_PASS: $SLACK_FASTAPI_DB_PASS
+    POSTGRES_USER: $SLACK_FASTAPI_DB_USER
     POSTGRES_DB: slack_fastapi
   before_script:
     - apt-get update -y
