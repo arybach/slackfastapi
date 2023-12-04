@@ -27,10 +27,16 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 10
         env:
-        - name: RABBITMQ_DEFAULT_USER
-          value: ${RABBITMQ_USER}
-        - name: RABBITMQ_DEFAULT_PASS
-          value: ${RABBITMQ_PASSWORD}
+        - name: RABBITMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: rabbitmq_user
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: rabbitmq_password
         - name: RABBITMQ_DEFAULT_VHOST
           value: "/"
         resources:
@@ -85,8 +91,14 @@ spec:
         - containerPort: 9419
         env:
         - name: RABBITMQ_URL
-          value: "http://slack-fastapi-rmq-service:15672" # Change if Management Plugin Port is different
+          value: "http://slack-fastapi-rmq-service:15672"
         - name: RABBITMQ_USER
-          value: ${RABBITMQ_USER}
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: rabbitmq_user
         - name: RABBITMQ_PASSWORD
-          value: ${RABBITMQ_PASSWORD}
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-credentials
+              key: rabbitmq_password
