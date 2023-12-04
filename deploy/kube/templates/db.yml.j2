@@ -26,12 +26,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_pass
+              key: postgres_password
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_user
+              key: postgres_user
         - name: POSTGRES_DB
           value: "slack_fastapi"
         ports:
@@ -80,12 +80,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_pass
+              key: postgres_password
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_user
+              key: postgres_user
         - name: "SLACK_FASTAPI_DB_HOST"
           value: "slack-fastapi-db-service"
       initContainers:
@@ -122,12 +122,12 @@ spec:
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fastapi_db_user
+              key: postgres_user
         - name: POSTGRES_PASSWORD
           valueFrom:
             secretKeyRef:
               name: postgres-credentials
-              key: slack_fast_db_pass
+              key: postgres_password
         ports:
         - containerPort: 9187
 

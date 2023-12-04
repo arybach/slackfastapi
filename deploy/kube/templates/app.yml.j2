@@ -30,12 +30,12 @@ spec:
         - name: SLACK_FASTAPI_DB_PASS
           valueFrom:
             secretKeyRef:
-              name: postgres-credentials
+              name: fastapi-credentials
               key: slack_fastapi_db_user
         - name: SLACK_FASTAPI_DB_USER
           valueFrom:
             secretKeyRef:
-              name: postgres-credentials
+              name: fastapi-credentials
               key: slack_fastapi_db_user
         - name: SLACK_FASTAPI_HOST
           value: "0.0.0.0"
