@@ -31,6 +31,8 @@ services:
       SLACK_FASTAPI_DB_BASE: slack_fastapi
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      POSTGRES_USER: ${SLACK_FASTAPI_DB_USER}
+      POSTGRES_PASSWORD: ${SLACK_FASTAPI_DB_PASSWORD}
     ports:
     - "8000:8000"
 
@@ -66,6 +68,8 @@ services:
       SLACK_FASTAPI_DB_BASE: slack_fastapi
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      POSTGRES_USER: ${SLACK_FASTAPI_DB_USER}
+      POSTGRES_PASSWORD: ${SLACK_FASTAPI_DB_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
