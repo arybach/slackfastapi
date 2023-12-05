@@ -1,6 +1,6 @@
 # FastAPI backend for SlackCutter APP
 
-## Important: export AWS_SECRET_ACCESS_KEY and AWS_ACCESS_KEY_ID or define them in .emv file
+## Important: export AWS_SECRET_ACCESS_KEY and AWS_ACCESS_KEY_ID or define them in .env file (dev only)
 
 ## Table of contents
 1. **[Project structure](#project-structure)**
