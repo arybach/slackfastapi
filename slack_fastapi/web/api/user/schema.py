@@ -16,7 +16,7 @@ class UserClipSettingsSchema(BaseModel):
     noice_threshold: Optional[List[int]] = [10, 90]
     audio_threshold: Optional[List[int]] = [25, 75]
     crop_interval: Optional[List[int]] = [1, 5]
-    sound_check: Optional[bool] = True
+    sound_check: Optional[bool] = False
 
     @root_validator
     def validate_fields(  # noqa: N805, C901, WPS238, WPS231

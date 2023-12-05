@@ -223,16 +223,16 @@ pytest -vv .
 [↑](#table-of-contents)
 ## Working with Swagger
 
-1. Visit **Swagger** page by default on [`https://api.redevops.io/api/docs`](https://api.redevops.io/api/docs)
+1. Visit **Swagger** page by default on [`http://localhost:8000/api/docs`](http://localhost:8000/api/docs)
 2. Register user account by `[POST] /api/auth/register`
 ```
-curl -k -X POST https://api.redevops.io/api/auth/register \
+curl -k -X POST http://localhost:8000/api/auth/register \
      -H "Content-Type: application/json" \
      -d '{"email": "mats.tumblebuns@gmail.com"}'
 ```
 3. Confirm email by `[POST] /api/auth/confirm` default code is **1234**
 ```
-curl -k -X POST https://api.redevops.io/api/auth/email/confirm \
+curl -k -X POST http://localhost:8000/api/auth/email/confirm \
      -H "Content-Type: application/json" \
      -d '{"email": "mats.tumblebuns@gmail.com", "code": "1234"}'
 
@@ -240,18 +240,18 @@ curl -k -X POST https://api.redevops.io/api/auth/email/confirm \
 4. Create new user credentials
 
 ```
-curl -k -X POST https://api.redevops.io/api/auth/setup \
+curl -k -X POST http://localhost:8000/api/auth/setup \
      -H "Content-Type: application/json" \
      -d '{"email": "mats.tumblebuns@gmail.com", "password": "tumblebuns", "first_name": "Mats", "last_name": "Tumblebuns"}'
 
 # this returns access_token, like:
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw'
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw'
 ```
 
 5. Paste `access_token` into **Authorization** field in the top-right of **Swagger** page
 ```
-curl -k -X GET https://api.redevops.io/api/user/settings \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw"
+curl -k -X GET http://localhost:8000/api/user/settings \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw"
 ```
 
 6. Enter user setting by `[PUT] /api/user/settings`. You can see the list of current ML models by `[GET] /api/user/models`.
@@ -273,9 +273,9 @@ Default settings is:
 
 ```
 curl -k -X 'POST' \
-  'https://api.redevops.io/api/video' \
+  'http://localhost:8000/api/video' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
   -H 'Content-Type: multipart/form-data' \
   -F 'video_file=@Best of BMX Best Tricks - Nitro World Games.mp4;type=video/mp4' \
   -F 'audio_file=' \
@@ -285,10 +285,10 @@ curl -k -X 'POST' \
 8. Copy video `id` from response of 7.
 9. Create clip by `[POST] /api/clip`
 ```
-curl -k -X 'POST' 'https://api.redevops.io/api/clip' \
+curl -k -X 'POST' 'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
   -d '{"id": 2, "output_name": "bmx_clip"}' \
   --max-time 300
 
@@ -297,10 +297,10 @@ curl -k -X 'POST' 'https://api.redevops.io/api/clip' \
 10. Download final clip by `[POST] /api/clip/download`
 
 ```
-curl -k -X 'POST' 'https://api.redevops.io/api/clip/download' \
+curl -k -X 'POST' 'http://localhost:8000/api/clip/download' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
   -d '{"id": 1}' \
   --output ~/Downloads/bmx_clip.mp4 \
   --max-time 300
@@ -310,7 +310,7 @@ curl -k -X 'POST' 'https://api.redevops.io/api/clip/download' \
 
 ```
 curl- k -X 'POST' \
-  'https://api.redevops.io/api/auth/reissue' \
+  'http://localhost:8000/api/auth/reissue' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=&username=mats.tumblebuns%40gmail.com&password=tumblebuns&scope=&client_id=&client_secret='
@@ -319,9 +319,9 @@ curl- k -X 'POST' \
 12. Delete video by `[DELETE] /api/video/{id}`
 
 ```
-curl -k -X 'DELETE' \\n  'https://api.redevops.io/api/clip' \
+curl -k -X 'DELETE' \\n  'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
   -d '{"id": 1}'\n
 ```
