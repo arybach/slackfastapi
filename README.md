@@ -245,13 +245,13 @@ curl -k -X POST http://localhost:8000/api/auth/setup \
      -d '{"email": "mats.tumblebuns@gmail.com", "password": "tumblebuns", "first_name": "Mats", "last_name": "Tumblebuns"}'
 
 # this returns access_token, like:
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A'
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs'
 ```
 
 5. Paste `access_token` into **Authorization** field in the top-right of **Swagger** page
 ```
 curl -k -X GET http://localhost:8000/api/user/settings \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A"
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs"
 ```
 
 6. Enter user setting by `[PUT] /api/user/settings`. You can see the list of current ML models by `[GET] /api/user/models`.
@@ -275,7 +275,7 @@ Default settings is:
 curl -k -X 'POST' \
   'http://localhost:8000/api/video' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs' \
   -H 'Content-Type: multipart/form-data' \
   -F 'video_file=@Danny MacAskill_ REAL MTB 2021 _ World of X Games.mp4;type=video/mp4' \
   -F 'audio_file=' \
@@ -288,7 +288,7 @@ curl -k -X 'POST' \
 curl -k -X 'POST' 'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs' \
   -d '{"id": 2, "output_name": "mtb_clip"}'
 ```
 
@@ -298,7 +298,7 @@ curl -k -X 'POST' 'http://localhost:8000/api/clip' \
 curl -k -X 'POST' 'http://localhost:8000/api/clip/download' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs' \
   -d '{"id": 1}' \
   --output ~/Downloads/mtb_clip.mp4
 ```
@@ -319,6 +319,6 @@ curl- k -X 'POST' \
 curl -k -X 'DELETE' \\n  'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3OTY0NjksImlhdCI6MTcwMTc3NDg2OSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.id1dU8mfqz3Pgx304gnBVvIjIPcshDoQIUFtRtMOp_A' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE4MDU4ODcsImlhdCI6MTcwMTc4NDI4Nywic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.1t-tnoz3xul5BxfEqM3aaAO5C_CWP6cDC8qZNxmTjqs' \
   -d '{"id": 1}'\n
 ```

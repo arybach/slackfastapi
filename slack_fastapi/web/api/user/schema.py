@@ -9,7 +9,7 @@ from slack_fastapi.settings import settings
 class UserClipSettingsSchema(BaseModel):
     """User parameters to change clip settings."""
 
-    trained_model: Optional[str] = Field(default="RanFor_Streams_Highlights.joblib")
+    trained_model: Optional[str] = Field(default="RanFor_Action_Sports.joblib")
     max_seconds_lenght: Optional[int] = Field(default="10")  # noqa: WPS432
     model_threshold: Optional[float] = Field(default=-1)  # noqa: WPS432
     median_hit_modificator: Optional[float] = Field(default=3)  # noqa: WPS432
