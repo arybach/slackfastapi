@@ -418,14 +418,18 @@ class VideoHandler:
                 user_id=user_id,
                 video_key=video_dict["video_key"],
             )
-            if video_model.audio_key != video_dict["audio_key"]:  # type: ignore
-                await VideoHandler.update_model_audio_with_key_validation(
-                    user_id=user_id,
-                    video_model=video_model,  # type: ignore
-                    audio_key=video_dict["audio_key"],
-                    audio_content_type=audio_content_type,
-                    video_dao=video_dao,
-                )
+            if video_model and video_model.audio_key:
+                if (
+                    video_dict["audio_key"]
+                    and video_model.audio_key != video_dict["audio_key"]
+                ):
+                    await VideoHandler.update_model_audio_with_key_validation(
+                        user_id=user_id,
+                        video_model=video_model,
+                        audio_key=video_dict["audio_key"],
+                        audio_content_type=audio_content_type,
+                        video_dao=video_dao,
+                    )
 
         else:
             video_model = await video_dao.create_video_model(
