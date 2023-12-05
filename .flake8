@@ -86,6 +86,10 @@ ignore =
   S104,
   ; Missing exception(s) in Raises section: -r HTTPException
   DAR401
+  ; Found too many await expressions
+  WPS217
+  ; Found too many local variables
+  WPS210
 
 per-file-ignores =
   ; all tests

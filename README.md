@@ -245,13 +245,13 @@ curl -k -X POST http://localhost:8000/api/auth/setup \
      -d '{"email": "mats.tumblebuns@gmail.com", "password": "tumblebuns", "first_name": "Mats", "last_name": "Tumblebuns"}'
 
 # this returns access_token, like:
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw'
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY'
 ```
 
 5. Paste `access_token` into **Authorization** field in the top-right of **Swagger** page
 ```
 curl -k -X GET http://localhost:8000/api/user/settings \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw"
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY"
 ```
 
 6. Enter user setting by `[PUT] /api/user/settings`. You can see the list of current ML models by `[GET] /api/user/models`.
@@ -275,7 +275,7 @@ Default settings is:
 curl -k -X 'POST' \
   'http://localhost:8000/api/video' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY' \
   -H 'Content-Type: multipart/form-data' \
   -F 'video_file=@Best of BMX Best Tricks - Nitro World Games.mp4;type=video/mp4' \
   -F 'audio_file=' \
@@ -288,10 +288,8 @@ curl -k -X 'POST' \
 curl -k -X 'POST' 'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
-  -d '{"id": 2, "output_name": "bmx_clip"}' \
-  --max-time 300
-
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY' \
+  -d '{"id": 2, "output_name": "bmx_clip"}'
 ```
 
 10. Download final clip by `[POST] /api/clip/download`
@@ -300,10 +298,9 @@ curl -k -X 'POST' 'http://localhost:8000/api/clip' \
 curl -k -X 'POST' 'http://localhost:8000/api/clip/download' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY' \
   -d '{"id": 1}' \
-  --output ~/Downloads/bmx_clip.mp4 \
-  --max-time 300
+  --output ~/Downloads/bmx_clip.mp4
 ```
 
 11. Reissue token if expired by `[POST] /api/auth/reissue`
@@ -322,6 +319,6 @@ curl- k -X 'POST' \
 curl -k -X 'DELETE' \\n  'http://localhost:8000/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODEwMDUsImlhdCI6MTcwMTc1OTQwNSwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.G3XKofIBeCsXNeuMkIQ1_-aKtGJy-5Em8_D78l5X-aw' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3ODQ0OTQsImlhdCI6MTcwMTc2Mjg5NCwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.Oc4oH4JtvLT2F8cWQBvY-7UdSDu4Ry_kc0O5AYnbtyY' \
   -d '{"id": 1}'\n
 ```

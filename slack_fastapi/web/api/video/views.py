@@ -1,6 +1,4 @@
-import asyncio
-
-from fastapi import APIRouter, File, HTTPException, UploadFile
+from fastapi import APIRouter, File, UploadFile
 from fastapi.param_functions import Depends
 from fastapi.responses import Response
 
@@ -127,33 +125,20 @@ async def create_clip(
     user_dao: UserDAO = Depends(),
 ) -> IdSchema:
     """
-    Endpoint to create a clip and make entries in S3 bucket and DB.
+    Endpoint to create clip and made entries in S3 bucket and DB.
 
-    This endpoint attempts to create a clip based on the provided data.
-    If the operation takes longer than the set timeout, it will raise an HTTPException.
-
-    Args:
-        clip_creation_object: The schema object for clip creation.
-        user_email: The email of the user, obtained from the token.
-        video_dao: Data access object for video operations.
-        user_dao: Data access object for user operations.
-
-    :return: The ID of the created clip.
-    :raises: HTTPException: If the request times out (taking longer than 300 seconds).
+    :param clip_creation_object: VideoModel's id and future clip name
+    :param user_email: User's email
+    :param video_dao: VideoDAO
+    :param user_dao: UserDAO
+    :return: ClipModel's id
     """
-    try:
-        # Set a timeout for the operation (e.g., 300 seconds)
-        return await asyncio.wait_for(
-            video_handler.create_clip(
-                clip_creation_object=clip_creation_object,
-                user_email=user_email,
-                video_dao=video_dao,
-                user_dao=user_dao,
-            ),
-            timeout=300,  # Timeout in seconds
-        )
-    except asyncio.TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timed out")
+    return await video_handler.create_clip(
+        clip_creation_object=clip_creation_object,
+        user_email=user_email,
+        video_dao=video_dao,
+        user_dao=user_dao,
+    )
 
 
 @router.delete(

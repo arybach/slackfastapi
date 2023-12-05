@@ -471,18 +471,18 @@ class VideoHandler:
         return f"{name}.{extension}"
 
     @staticmethod
-    async def upload_video(  # noqa: WPS217
+    async def upload_video(
         video_file: UploadFile,
-        audio_file: UploadFile,
+        audio_file: Optional[UploadFile],  # Marking it as optional
         user_email: str,
         video_dao: VideoDAO,
         user_dao: UserDAO,
     ) -> IdSchema:
         """
-        Uploades media to s3 bucket, makes entries in DB.
+        Uploads media to s3 bucket, makes entries in DB.
 
         :param video_file: UploadFile
-        :param audio_file: UploadFile
+        :param audio_file: Optional UploadFile
         :param user_email: User's email
         :param video_dao: VideoDAO
         :param user_dao: UserDAO
@@ -498,56 +498,71 @@ class VideoHandler:
                 video_dao,
             )
 
-        files = [{}, {}]  # type: ignore
-
-        files[0]["body"] = await VideoHandler.validate_file(
+        # Process Video File
+        video_body = await VideoHandler.validate_file(
             video_file,
             mime_types=[
                 "video/mp4",
                 "video/webm",
             ],
         )
-        files[0]["content_type"] = video_file.content_type
-        files[0]["name"] = video_file.filename
-        files[0]["md5name"] = await VideoHandler.generate_md5_filename(
-            file=files[0]["body"],
+        video_md5name = await VideoHandler.generate_md5_filename(
+            file=video_body,
             filename=video_file.filename,
         )
-        files[0]["key"] = await VideoHandler.generate_media_key(
-            user_email=user_email,
-            md5name=files[0]["md5name"],
-        )
+        video_dict = {
+            "body": video_body,
+            "content_type": video_file.content_type,
+            "name": video_file.filename,
+            "md5name": video_md5name,
+            "key": await VideoHandler.generate_media_key(
+                user_email=user_email,
+                md5name=video_md5name,
+            ),
+        }
 
+        # Process Audio File if provided
+        audio_dict = {}
         if audio_file:
-            files[1]["body"] = await VideoHandler.validate_file(
+            audio_body = await VideoHandler.validate_file(
                 audio_file,
                 max_size=20000000,  # noqa: WPS432
                 mime_types=[
                     "audio/mpeg",
                 ],
             )
-            files[1]["content_type"] = audio_file.content_type
-            files[1]["name"] = audio_file.filename
-            files[1]["md5name"] = await VideoHandler.generate_md5_filename(
-                file=files[1]["body"],
+            audio_md5name = await VideoHandler.generate_md5_filename(
+                file=audio_body,
                 filename=audio_file.filename,
             )
-            files[1]["key"] = await VideoHandler.generate_media_key(
-                user_email=user_email,
-                md5name=files[1]["md5name"],
-            )
+            audio_dict = {
+                "body": audio_body,
+                "content_type": audio_file.content_type,
+                "name": audio_file.filename,
+                "md5name": audio_md5name,
+                "key": await VideoHandler.generate_media_key(
+                    user_email=user_email,
+                    md5name=audio_md5name,
+                ),
+            }
 
+        # Upload to S3
         uploaded = await VideoHandler.s3_upload_media(
-            video_dict=files[0],
-            audio_dict=files[1],
+            video_dict=video_dict,
+            audio_dict=audio_dict
+            if audio_dict
+            else {},  # Pass empty dict if audio_dict is None
         )
 
+        # Handle DB operations
         video_model = await VideoHandler.handle_models(
             user_id=user.id,  # type: ignore
-            video_dict=files[0],
-            audio_dict=files[1],
+            video_dict=video_dict,
+            audio_dict=audio_dict
+            if audio_dict
+            else {},  # Pass empty dict if audio_dict is None
             video_created=uploaded[0],
-            audio_created=uploaded[1],
+            audio_created=uploaded[1] if audio_dict else False,
             video_dao=video_dao,
         )
 
