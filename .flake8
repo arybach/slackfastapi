@@ -94,6 +94,8 @@ ignore =
   WPS231
   ; Found multiline conditions
   WPS337
+  ; Found useless returning `else` statement
+  WPS503
 
 per-file-ignores =
   ; all tests

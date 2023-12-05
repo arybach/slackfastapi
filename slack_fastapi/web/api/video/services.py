@@ -570,9 +570,11 @@ class VideoHandler:
             video_dao=video_dao,
         )
 
-        return IdSchema(
-            id=video_model.id,
-        )
+        # Check if video_model is not None before trying to access its id
+        if video_model is None:
+            raise HTTPException(status_code=500, detail="Failed to create video model")
+        else:
+            return IdSchema(id=video_model.id)
 
     @staticmethod
     async def get_all_videos(
