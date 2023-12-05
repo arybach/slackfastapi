@@ -223,38 +223,35 @@ pytest -vv .
 [↑](#table-of-contents)
 ## Working with Swagger
 
-1. Visit **Swagger** page by default on [`127.0.0.1:8000/api/docs`](http://127.0.0.1:8000/api/docs)
+1. Visit **Swagger** page by default on [`https://api.redevops.io/api/docs`](https://api.redevops.io/api/docs)
 2. Register user account by `[POST] /api/auth/register`
 ```
-curl -X POST http://127.0.0.1:8000/api/auth/register \
+curl -k -X POST https://api.redevops.io/api/auth/register \
      -H "Content-Type: application/json" \
      -d '{"email": "mats.tumblebuns@gmail.com"}'
 ```
 3. Confirm email by `[POST] /api/auth/confirm` default code is **1234**
 ```
-curl -X POST http://127.0.0.1:8000/api/auth/email/confirm \
+curl -k -X POST https://api.redevops.io/api/auth/email/confirm \
      -H "Content-Type: application/json" \
      -d '{"email": "mats.tumblebuns@gmail.com", "code": "1234"}'
+
 ```
 4. Create new user credentials
 
 ```
-curl -X POST http://127.0.0.1:8000/api/auth/setup \
+curl -k -X POST https://api.redevops.io/api/auth/setup \
      -H "Content-Type: application/json" \
-     -d '{\
-               "email": "mats.tumblebuns@gmail.com",\
-               "password": "tumblebuns",\
-               "first_name": "Mats",\
-               "last_name": "Tumblebuns"\
-         }'
+     -d '{"email": "mats.tumblebuns@gmail.com", "password": "tumblebuns", "first_name": "Mats", "last_name": "Tumblebuns"}'
+
 # this returns access_token, like:
-'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA'
+'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw'
 ```
 
 5. Paste `access_token` into **Authorization** field in the top-right of **Swagger** page
 ```
-curl -X GET http://127.0.0.1:8000/api/user/settings \
-     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA"
+curl -k -X GET https://api.redevops.io/api/user/settings \
+     -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw"
 ```
 
 6. Enter user setting by `[PUT] /api/user/settings`. You can see the list of current ML models by `[GET] /api/user/models`.
@@ -275,39 +272,45 @@ Default settings is:
 7. Upload the source video by `[POST] /api/video`
 
 ```
-curl -X 'POST' \\n  'http://127.0.0.1:8000/api/video' \
+curl -k -X 'POST' \
+  'https://api.redevops.io/api/video' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
   -H 'Content-Type: multipart/form-data' \
-  -F 'video_file=@Big Wave Carnage at Red Bull Cape Fear 2016 - Action Highlights.mp4;type=video/mp4' \
-  -F 'audio_file='
+  -F 'video_file=@Best of BMX Best Tricks - Nitro World Games.mp4;type=video/mp4' \
+  -F 'audio_file=' \
+  --max-time 300
 ```
 
 8. Copy video `id` from response of 7.
 9. Create clip by `[POST] /api/clip`
 ```
-curl -X 'POST' \\n  'http://127.0.0.1:8000/api/clip' \
+curl -k -X 'POST' 'https://api.redevops.io/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
-  -d '{"id": 1, "output_name": "redbull_clip"}'\n
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -d '{"id": 2, "output_name": "bmx_clip"}' \
+  --max-time 300
+
 ```
 
 10. Download final clip by `[POST] /api/clip/download`
 
 ```
-curl -X 'POST' \\n  'http://127.0.0.1:8000/api/clip/download' \
+curl -k -X 'POST' 'https://api.redevops.io/api/clip/download' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
-  -d '{"id": 1}' \\n  --output ~/Downloads/redbull_clip.mp4
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
+  -d '{"id": 1}' \
+  --output ~/Downloads/bmx_clip.mp4 \
+  --max-time 300
 ```
 
 11. Reissue token if expired by `[POST] /api/auth/reissue`
 
 ```
-curl -X 'POST' \
-  'http://127.0.0.1:8000/api/auth/reissue' \
+curl- k -X 'POST' \
+  'https://api.redevops.io/api/auth/reissue' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/x-www-form-urlencoded' \
   -d 'grant_type=&username=mats.tumblebuns%40gmail.com&password=tumblebuns&scope=&client_id=&client_secret='
@@ -316,9 +319,9 @@ curl -X 'POST' \
 12. Delete video by `[DELETE] /api/video/{id}`
 
 ```
-curl -X 'DELETE' \\n  'http://127.0.0.1:8000/api/clip' \
+curl -k -X 'DELETE' \\n  'https://api.redevops.io/api/clip' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDExNjAzODYsImlhdCI6MTcwMTEzODc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzLnR1bWJsZWJ1bnNAZ21haWwuY29tIn0.FncFAdUMBOg9OlR0MVN_Gt8EXr8V2xZzoJN_3N_dcDA' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDE3NzQzODYsImlhdCI6MTcwMTc1Mjc4Niwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJzdWIiOiJtYXRzQGdtYWlsLmNvbSJ9.b153eEtwjVs70xmjWOAX1Gh0HdDZqYhsAHTfgw25Npw' \
   -d '{"id": 1}'\n
 ```

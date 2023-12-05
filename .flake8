@@ -84,6 +84,8 @@ ignore =
   WPS432,
   ; Possible binding to all interfaces
   S104,
+  ; Missing exception(s) in Raises section: -r HTTPException
+  DAR401
 
 per-file-ignores =
   ; all tests
